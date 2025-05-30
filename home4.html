@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Goose Portal – Responsive Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col">
+  <div class="flex flex-1 w-full min-h-0">
+    <!-- Sidebar (desktop only) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-[#e7eaf0] px-6 py-6 min-h-screen">
+      <div>
+        <h1 class="text-lg font-bold text-[#121416]">Maverick</h1>
+        <p class="text-sm text-[#6a7681] mb-8">AI-Powered Learning</p>
+      </div>
+      <nav class="flex flex-col gap-1 mb-10">
+        <!-- ...nav items unchanged... -->
+        <!-- (snipped for brevity, use your provided nav markup here) -->
+      </nav>
+      <!-- Chat History -->
+      <div class="mt-2">
+        <h3 class="text-[#121416] text-[16px] font-bold mb-3">Chat History</h3>
+        <div class="mb-2">
+          <input type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f1f2f4] cursor-pointer">
+            <div class="rounded-lg bg-[#f1f2f4] p-2">
+              <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="..."/></svg>
+            </div>
+            <div>
+              <p class="text-[#121416] text-sm font-medium">Conversation with Goose</p>
+              <p class="text-[#6a7681] text-xs">Today, 10:30 AM</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] cursor-pointer">
+            <div class="rounded-lg bg-[#f1f2f4] p-2">
+              <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="..."/></svg>
+            </div>
+            <div>
+              <p class="text-[#121416] text-sm font-medium">Conversation with Owen</p>
+              <p class="text-[#6a7681] text-xs">Yesterday, 2:15 PM</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] cursor-pointer">
+            <div class="rounded-lg bg-[#f1f2f4] p-2">
+              <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="..."/></svg>
+            </div>
+            <div>
+              <p class="text-[#121416] text-sm font-medium">Conversation with Harper</p>
+              <p class="text-[#6a7681] text-xs">2 days ago, 4:45 PM</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col min-h-0">
+      <!-- Header -->
+      <header class="flex items-center border-b border-gray-200 h-14 px-4 md:px-8">
+        <button class="md:hidden mr-2 text-gray-400 focus:outline-none" aria-label="Back">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <h1 class="flex-1 text-center text-xl font-bold text-[#121416] md:text-left">Chat with Goose</h1>
+        <div class="w-8"></div>
+      </header>
+      <!-- Quick Access -->
+      <section class="w-full px-2 pt-4 md:px-8 md:pt-8">
+        <h2 class="text-[#121416] text-[22px] font-bold mb-3 md:mb-4">Quick Access</h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 md:gap-4">
+          <!-- 6 Panels, SMALL for mobile -->
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuANYJc-qk0BJuZbr9NrdoX1mJ-5TmWYZZI-noJamwmbHZUCdg9SX7R3ZRyNTPygERvxim4BnzAjHtIQ5gP4-JZAmGA8G4pX3EEuZ74-aeJZKgTWgcki7KKhtq2dijzNlw3lQaJBM9j0NGczk-R_sxuVyYL4XpFx-hnjpcmSpIk-odcANNIuM-SvU_oQvTkKstSsqoF6sb9mAZQ_pQsK83KcoLHVjrFIWeRlfDvmrxry9s4f4Yx8xyB6h6I-pZiVZnLILwfS09dLh6Y" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Onboard</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Step-by-step guide.</span>
+          </div>
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTxJxeZ8BJs-QRB1NPOtmYLlxndoV2P0v_g7PoYrehjpyjyzMPahXh-0wwvaMN0sKA9WY5VkuoRAbr1F8N5ahpWJWfH1KdfLrNZs8UI610iH_2Fyl1kXvM-slvoM59UwE0jsu5TIwT4NbPJb_VHpnrKpjLIloMMFXDfYe5uPWJeCMNGwuksHi-VVjjvg-0XZKfdmeuTSjQcUw-DzNU-cfrySwvSLCVtectq-hYNko9Af2rraSQNpT8fGD4xhNFQc1sFMBTKH6KG3c" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Paths</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Personalized training.</span>
+          </div>
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4YpGe23t1qiKbsIjNveBlgmwnoS3zbT32tAeEJOH1BaDx275TFVO5JgsUQsYTagFBbu76A7O2wqs_tKuZUghHa6lKp1pNiyo-Zu3Lt0fnF7vldw6RtfSc2ty1E9JcdcOjAnNaI0EvAPZYFE7p9sAxGi8LsFeeD0YVj16-urMOVYytgS5z5nho_0oHs9M8GaO5mBzgV4afQolsUSGiYquB9sIGnaVpc2YXtMDchp_WLGw3vx_VEoBv8IztGI7d5vwKR7i-aJMgtt8" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Library</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Educational materials.</span>
+          </div>
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDYFFHlmJT-Dw70ZoVlFrpCrypxz5HFJG5am6tXBQZESP_ZwOHgLAiEc5EOlxUkODeXlLvi1wWjq-L4ieMyh26EypReKoTWt0OBzRoOMCnd33gbe1g5K5JJh7XvzFpSSpal-zioo9UiKUn4GucABdrzEoVepCQWqc5Eh7eG_MrfTViNF2OGOXdz1IM-L67qycA2tzJ30C78rVb5j4o81mUoJsUsSaAu6lfYlVl-qvCyXNmff9_tWJh0bmbL7GS1sXVYVdtsIU_5zc" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Planning</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Plan schedule.</span>
+          </div>
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-W2PgNH6EeTndwpNIDxD4R17117D3htQodbKmpqoUb3Wu73ihM06iL0eCwzTVKhitevHBXtllBLkVIAxjGuMkL6e7bZ96C9OR47w8OdhPhOdoxJE15jyQZVoPDVCJYpocD0p_k8xYe3xBD3GKLdeRk7_y0yZV8-po9UENbGveLHE3Tcrh1MFLt5gf-sEzln516w2SH_JkAncl-LN06HLnQ-Y89u0kGGMoyaxZ3bvMKnJCulK0dEe2DjsyRsw9J0gsHtmLbyKEosg" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Mentor</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Contact mentor.</span>
+          </div>
+          <div class="bg-white border border-[#dde1e3] rounded-lg p-2 flex flex-col items-center hover:shadow transition">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBynU9J5xEyjCBSJI00H0cXFQg4oLxl9BTG9_AUoNBwP1WF-yXEruxhpeOkn6kcSL4DPE2aeuEdQnscHK2nxDouqTpyKlPfifBU7x-6YsMWrVmzc24uiM2diymerBSTP4Ou37W7fpdKrh5Ih3WQFi6oidGCHTevEI9Z9KKN8mMTN98YyoR2CEzHTZXn6gKZhZTdKTbJ3yrcc8O6w08MvPP1RfOwFUvMVipnfanxR8A24uul9L37yNK6wkeDWp0UH5Kk7q76jBx1uLc" class="w-7 h-7 rounded-lg mb-1 object-cover" />
+            <span class="font-semibold text-xs text-[#121416] mb-0.5">Billing</span>
+            <span class="text-[10px] text-[#6a7681] text-center leading-tight">Manage payments.</span>
+          </div>
+        </div>
+      </section>
+      <!-- Chat -->
+      <main class="flex-1 flex flex-col gap-4 px-2 pt-4 md:px-8 overflow-y-auto w-full">
+        <!-- ...chat content (unchanged)... -->
+      </main>
+      <!-- Chat input and bottom nav remain as before -->
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Goose Portal - Maverick</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <style>
+      body { font-family: 'Inter', 'Noto Sans', sans-serif; }
+    </style>
+  </head>
+  <body class="bg-[#f7f8fa] min-h-screen w-full">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white border-r border-[#e7eaf0] flex flex-col px-6 py-6">
+        <div>
+          <h1 class="text-lg font-bold text-[#121416] mb-0">Maverick</h1>
+          <p class="text-sm text-[#6a7681] mb-8">AI-Powered Learning</p>
+        </div>
+        <nav class="flex flex-col gap-1 mb-10">
+          <!-- ...Nav items unchanged... -->
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
+            <svg class="text-[#121416]" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M218.83,103.77l-80-75.48a1.14,1.14,0,0,1-.11-.11,16,16,0,0,0-21.53,0l-.11.11L37.17,103.77A16,16,0,0,0,32,115.55V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V160h32v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V115.55A16,16,0,0,0,218.83,103.77ZM208,208H160V160a16,16,0,0,0-16-16H112a16,16,0,0,0-16,16v48H48V115.55l.11-.1L128,40l79.9,75.43.11.1Z"></path></svg>
+            <span class="text-[#121416] text-sm font-medium">Home</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f1f2f4] font-semibold">
+            <svg class="text-[#121416]" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24ZM84,140a12,12,0,1,1,12-12A12,12,0,0,1,84,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,172,140Z"></path></svg>
+            <span class="text-[#121416] text-sm font-medium">Chat</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
+            <svg class="text-[#121416]" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H136V24a8,8,0,0,0-16,0V40H40A16,16,0,0,0,24,56V176a16,16,0,0,0,16,16H79.36L57.75,219a8,8,0,0,0,12.5,10l29.59-37h56.32l29.59,37a8,8,0,1,0,12.5-10l-21.61-27H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,136H40V56H216V176Z"></path></svg>
+            <span class="text-[#121416] text-sm font-medium">Training</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
+            <svg class="text-[#121416]" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,16V161.57l-51.77-32.35a8,8,0,0,0-8.48,0L72,161.56V48ZM132.23,177.22a8,8,0,0,0-8.48,0L72,209.57V180.43l56-35,56,35v29.14Z"></path></svg>
+            <span class="text-[#121416] text-sm font-medium">Resources</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
+            <svg class="text-[#121416]" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"></path></svg>
+            <span class="text-[#121416] text-sm font-medium">Profile</span>
+          </a>
+        </nav>
+        <!-- Chat History -->
+        <div class="mt-2">
+          <h3 class="text-[#121416] text-[16px] font-bold mb-3">Chat History</h3>
+          <div class="mb-2">
+            <input type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f1f2f4] cursor-pointer">
+              <div class="rounded-lg bg-[#f1f2f4] p-2">
+                <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24ZM84,140a12,12,0,1,1,12-12A12,12,0,0,1,84,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,172,140Z"></path></svg>
+              </div>
+              <div>
+                <p class="text-[#121416] text-sm font-medium">Conversation with Goose</p>
+                <p class="text-[#6a7681] text-xs">Today, 10:30 AM</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] cursor-pointer">
+              <div class="rounded-lg bg-[#f1f2f4] p-2">
+                <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24ZM84,140a12,12,0,1,1,12-12A12,12,0,0,1,84,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,172,140Z"></path></svg>
+              </div>
+              <div>
+                <p class="text-[#121416] text-sm font-medium">Conversation with Owen</p>
+                <p class="text-[#6a7681] text-xs">Yesterday, 2:15 PM</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] cursor-pointer">
+              <div class="rounded-lg bg-[#f1f2f4] p-2">
+                <svg class="w-5 h-5 text-[#121416]" fill="currentColor" viewBox="0 0 256 256"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24ZM84,140a12,12,0,1,1,12-12A12,12,0,0,1,84,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm44,0a12,12,0,1,1,12-12A12,12,0,0,1,172,140Z"></path></svg>
+              </div>
+              <div>
+                <p class="text-[#121416] text-sm font-medium">Conversation with Harper</p>
+                <p class="text-[#6a7681] text-xs">2 days ago, 4:45 PM</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <!-- Main Content (fills the rest) -->
+      <main class="flex-1 flex flex-col min-w-0">
+        <!-- Quick Access -->
+        <!-- Quick Access -->
+        <section class="w-full px-12 pt-8">
+          <h2 class="text-[#121416] text-[22px] font-bold mb-4">Quick Access</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <!-- 6 Panels -->
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuANYJc-qk0BJuZbr9NrdoX1mJ-5TmWYZZI-noJamwmbHZUCdg9SX7R3ZRyNTPygERvxim4BnzAjHtIQ5gP4-JZAmGA8G4pX3EEuZ74-aeJZKgTWgcki7KKhtq2dijzNlw3lQaJBM9j0NGczk-R_sxuVyYL4XpFx-hnjpcmSpIk-odcANNIuM-SvU_oQvTkKstSsqoF6sb9mAZQ_pQsK83KcoLHVjrFIWeRlfDvmrxry9s4f4Yx8xyB6h6I-pZiVZnLILwfS09dLh6Y" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Onboarding Guide</span>
+              <span class="text-xs text-[#6a7681] text-center">Step-by-step instructions to get started.</span>
+            </div>
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTxJxeZ8BJs-QRB1NPOtmYLlxndoV2P0v_g7PoYrehjpyjyzMPahXh-0wwvaMN0sKA9WY5VkuoRAbr1F8N5ahpWJWfH1KdfLrNZs8UI610iH_2Fyl1kXvM-slvoM59UwE0jsu5TIwT4NbPJb_VHpnrKpjLIloMMFXDfYe5uPWJeCMNGwuksHi-VVjjvg-0XZKfdmeuTSjQcUw-DzNU-cfrySwvSLCVtectq-hYNko9Af2rraSQNpT8fGD4xhNFQc1sFMBTKH6KG3c" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Learning Paths</span>
+              <span class="text-xs text-[#6a7681] text-center">Explore personalized training programs.</span>
+            </div>
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4YpGe23t1qiKbsIjNveBlgmwnoS3zbT32tAeEJOH1BaDx275TFVO5JgsUQsYTagFBbu76A7O2wqs_tKuZUghHa6lKp1pNiyo-Zu3Lt0fnF7vldw6RtfSc2ty1E9JcdcOjAnNaI0EvAPZYFE7p9sAxGi8LsFeeD0YVj16-urMOVYytgS5z5nho_0oHs9M8GaO5mBzgV4afQolsUSGiYquB9sIGnaVpc2YXtMDchp_WLGw3vx_VEoBv8IztGI7d5vwKR7i-aJMgtt8" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Resource Library</span>
+              <span class="text-xs text-[#6a7681] text-center">Access a wealth of educational materials.</span>
+            </div>
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDYFFHlmJT-Dw70ZoVlFrpCrypxz5HFJG5am6tXBQZESP_ZwOHgLAiEc5EOlxUkODeXlLvi1wWjq-L4ieMyh26EypReKoTWt0OBzRoOMCnd33gbe1g5K5JJh7XvzFpSSpal-zioo9UiKUn4GucABdrzEoVepCQWqc5Eh7eG_MrfTViNF2OGOXdz1IM-L67qycA2tzJ30C78rVb5j4o81mUoJsUsSaAu6lfYlVl-qvCyXNmff9_tWJh0bmbL7GS1sXVYVdtsIU_5zc" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Planning</span>
+              <span class="text-xs text-[#6a7681] text-center">Plan your learning schedule</span>
+            </div>
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-W2PgNH6EeTndwpNIDxD4R17117D3htQodbKmpqoUb3Wu73ihM06iL0eCwzTVKhitevHBXtllBLkVIAxjGuMkL6e7bZ96C9OR47w8OdhPhOdoxJE15jyQZVoPDVCJYpocD0p_k8xYe3xBD3GKLdeRk7_y0yZV8-po9UENbGveLHE3Tcrh1MFLt5gf-sEzln516w2SH_JkAncl-LN06HLnQ-Y89u0kGGMoyaxZ3bvMKnJCulK0dEe2DjsyRsw9J0gsHtmLbyKEosg" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Contact your mentor</span>
+              <span class="text-xs text-[#6a7681] text-center">Get in touch with your mentor</span>
+            </div>
+            <div class="bg-white border border-[#dde1e3] rounded-xl p-4 flex flex-col items-center hover:shadow transition">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBynU9J5xEyjCBSJI00H0cXFQg4oLxl9BTG9_AUoNBwP1WF-yXEruxhpeOkn6kcSL4DPE2aeuEdQnscHK2nxDouqTpyKlPfifBU7x-6YsMWrVmzc24uiM2diymerBSTP4Ou37W7fpdKrh5Ih3WQFi6oidGCHTevEI9Z9KKN8mMTN98YyoR2CEzHTZXn6gKZhZTdKTbJ3yrcc8O6w08MvPP1RfOwFUvMVipnfanxR8A24uul9L37yNK6wkeDWp0UH5Kk7q76jBx1uLc" class="w-12 h-12 rounded-lg mb-2 object-cover" />
+              <span class="font-semibold text-sm text-[#121416] mb-1">Billing</span>
+              <span class="text-xs text-[#6a7681] text-center">Manage your payments</span>
+            </div>
+          </div>
+        </section>
+        <!-- Chat Area: fills ALL available width -->
+        <section class="flex flex-col flex-1 px-12 pb-6 pt-4">
+          <h2 class="text-[#121416] text-[28px] font-bold mb-4 mt-4">Chat with Goose</h2>
+          <div class="flex flex-col gap-4 flex-1">
+            <!-- Goose Message -->
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#f1f2f4]">
+                <!-- Simple goose SVG -->
+                <svg viewBox="0 0 48 48" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="24" cy="28" rx="14" ry="10" fill="#fff" stroke="#121416" stroke-width="2"/>
+                  <ellipse cx="24" cy="14" rx="7" ry="6" fill="#fff" stroke="#121416" stroke-width="2"/>
+                  <ellipse cx="21.5" cy="13" rx="1.2" ry="1.2" fill="#121416"/>
+                  <path d="M31 13c2.5-2 6 2 3 4" stroke="#ffa726" stroke-width="2" fill="none"/>
+                  <path d="M30 13c2-1 5 2 2.2 3.3" stroke="#ffa726" stroke-width="2" fill="none"/>
+                  <path d="M29 15l2 1" stroke="#ffa726" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+              <div>
+                <div class="text-[#6a7681] text-xs mb-1">Goose</div>
+                <div class="bg-[#f1f2f4] rounded-xl px-4 py-3 text-[#121416] max-w-xl">Hi there! I'm Goose, your AI assistant. How can I help you today?</div>
+              </div>
+            </div>
+            <!-- Ethan Message -->
+            <div class="flex items-start gap-3 justify-end">
+              <div class="flex flex-col items-end">
+                <div class="text-[#6a7681] text-xs mb-1 text-right">Ethan</div>
+                <div class="bg-[#dce8f3] rounded-xl px-4 py-3 text-[#121416] max-w-xl">Hi Goose, I'm new here and need help with onboarding.</div>
+              </div>
+              <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#dce8f3]">
+                <!-- Ethan's avatar as a placeholder (or use an image if you wish) -->
+                <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+                  <circle cx="24" cy="24" r="22" fill="#fff" stroke="#b0bec5" stroke-width="2"/>
+                  <ellipse cx="24" cy="19" rx="7" ry="7" fill="#b0bec5"/>
+                  <ellipse cx="24" cy="34" rx="13" ry="8" fill="#b0bec5"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Goose Message -->
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#f1f2f4]">
+                <svg viewBox="0 0 48 48" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="24" cy="28" rx="14" ry="10" fill="#fff" stroke="#121416" stroke-width="2"/>
+                  <ellipse cx="24" cy="14" rx="7" ry="6" fill="#fff" stroke="#121416" stroke-width="2"/>
+                  <ellipse cx="21.5" cy="13" rx="1.2" ry="1.2" fill="#121416"/>
+                  <path d="M31 13c2.5-2 6 2 3 4" stroke="#ffa726" stroke-width="2" fill="none"/>
+                  <path d="M30 13c2-1 5 2 2.2 3.3" stroke="#ffa726" stroke-width="2" fill="none"/>
+                  <path d="M29 15l2 1" stroke="#ffa726" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+              <div>
+                <div class="text-[#6a7681] text-xs mb-1">Goose</div>
+                <div class="bg-[#f1f2f4] rounded-xl px-4 py-3 text-[#121416] max-w-xl">Welcome, Ethan! I can guide you through the onboarding process. First, let's set up your profile and learning goals.</div>
+              </div>
+            </div>
+          </div>
+          <!-- Chat Input Bar -->
+          <form class="w-full mt-8 flex gap-2">
+            <input type="text" placeholder="Message Goose..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
+            <button type="submit" class="bg-[#dce8f3] text-[#121416] px-6 py-2 rounded-full font-semibold text-sm">Send</button>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
