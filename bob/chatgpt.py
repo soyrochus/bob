@@ -13,3 +13,14 @@ async def chat(messages):
         model="gpt-4", messages=messages
     )
     return response.choices[0].message["content"]
+
+
+async def stream_chat(messages):
+    """Yield the assistant response in chunks using OpenAI's streaming API."""
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-4", messages=messages, stream=True
+    )
+    async for chunk in response:
+        delta = chunk.choices[0]["delta"].get("content")
+        if delta:
+            yield delta
