@@ -47,7 +47,16 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         .order_by(Conversation.created_at.desc())
         .all()
     )
-    conv = conversations[0] if conversations else None
+
+    if not conversations:
+        conv = Conversation(title="New Conversation", user_id=user.id)
+        db.add(conv)
+        db.commit()
+        db.refresh(conv)
+        conversations = [conv]
+    else:
+        conv = conversations[0]
+
     messages = conv.messages if conv else []
     return templates.TemplateResponse(
         "home.html",
@@ -122,6 +131,28 @@ async def new_conversation(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         "partials/conversation_link.html",
         {"request": request, "conv": conv},
+    )
+
+
+@app.get("/conversations/search", response_class=HTMLResponse)
+async def search_conversations(q: str, request: Request, db: Session = Depends(get_db)):
+    user = await get_or_create_user(db)
+    conversations = (
+        db.query(Conversation)
+        .filter(
+            Conversation.user_id == user.id,
+            Conversation.title.ilike(f"%{q}%"),
+        )
+        .order_by(Conversation.created_at.desc())
+        .all()
+    )
+    return templates.TemplateResponse(
+        "partials/conversation_list.html",
+        {
+            "request": request,
+            "conversations": conversations,
+            "active_conversation": None,
+        },
     )
 
 

@@ -41,18 +41,12 @@
     </nav>
     <div class="mt-2">
       <h3 class="text-[#121416] text-[16px] font-bold mb-3">Chat History</h3>
-      <div class="mb-2">
-        <input type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0" />
+      <div class="mb-2 flex items-center justify-between">
+        <button hx-post="/new-conversation" hx-target="#conversation-list" hx-swap="afterbegin" class="px-2 py-1 rounded text-sm bg-[#f1f2f4]">+ New</button>
+        <input hx-get="/conversations/search" hx-target="#conversation-list" hx-trigger="keyup changed delay:300ms" name="q" type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0 ml-2" />
       </div>
-      <div class="flex flex-col gap-1">
-        {% for conv in conversations %}
-        <a href="/conversations/{{ conv.id }}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if active_conversation and active_conversation.id == conv.id %}bg-[#f1f2f4]{% else %}hover:bg-[#f1f2f4]{% endif %} cursor-pointer">
-          <div>
-            <p class="text-[#121416] text-sm font-medium">{{ conv.title }}</p>
-            <p class="text-[#6a7681] text-xs">{{ conv.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-          </div>
-        </a>
-        {% endfor %}
+      <div id="conversation-list" class="flex flex-col gap-1">
+        {% include 'partials/conversation_list.html' with context %}
       </div>
     </div>
   </aside>
