@@ -1,0 +1,32 @@
+{% if msg.sender == 'bob' %}
+<div class="flex items-start gap-3">
+  <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#f1f2f4]">
+    <svg viewBox="0 0 48 48" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="24" cy="28" rx="14" ry="10" fill="#fff" stroke="#121416" stroke-width="2"/>
+      <ellipse cx="24" cy="14" rx="7" ry="6" fill="#fff" stroke="#121416" stroke-width="2"/>
+      <ellipse cx="21.5" cy="13" rx="1.2" ry="1.2" fill="#121416"/>
+      <path d="M31 13c2.5-2 6 2 3 4" stroke="#ffa726" stroke-width="2" fill="none"/>
+      <path d="M30 13c2-1 5 2 2.2 3.3" stroke="#ffa726" stroke-width="2" fill="none"/>
+      <path d="M29 15l2 1" stroke="#ffa726" stroke-width="2" fill="none"/>
+    </svg>
+  </div>
+  <div>
+    <div class="text-[#6a7681] text-xs mb-1">Bob</div>
+    <div class="bg-[#f1f2f4] rounded-xl px-4 py-3 text-[#121416] max-w-xl">{{ msg.text }}</div>
+  </div>
+</div>
+{% else %}
+<div class="flex items-start gap-3 justify-end">
+  <div class="flex flex-col items-end">
+    <div class="text-[#6a7681] text-xs mb-1 text-right">Ethan</div>
+    <div class="bg-[#dce8f3] rounded-xl px-4 py-3 text-[#121416] max-w-xl">{{ msg.text }}</div>
+  </div>
+  <div class="w-10 h-10 flex items-center justify-center rounded-full bg-[#dce8f3]">
+    <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+      <circle cx="24" cy="24" r="22" fill="#fff" stroke="#b0bec5" stroke-width="2"/>
+      <ellipse cx="24" cy="19" rx="7" ry="7" fill="#b0bec5"/>
+      <ellipse cx="24" cy="34" rx="13" ry="8" fill="#b0bec5"/>
+    </svg>
+  </div>
+</div>
+{% endif %}
