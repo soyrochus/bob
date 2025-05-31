@@ -262,6 +262,55 @@ wheels = [
 ]
 
 [[package]]
+name = "bob"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "chromadb" },
+    { name = "fastapi" },
+    { name = "jinja2" },
+    { name = "langchain", version = "0.2.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12.4'" },
+    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12.4'" },
+    { name = "openai" },
+    { name = "pdfplumber" },
+    { name = "pydantic" },
+    { name = "python-docx" },
+    { name = "python-dotenv" },
+    { name = "python-multipart" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "black" },
+    { name = "isort" },
+    { name = "mypy" },
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "black", marker = "extra == 'dev'", specifier = ">=24.3.0,<25.0.0" },
+    { name = "chromadb", specifier = ">=0.3.31,<1.0.0" },
+    { name = "fastapi", specifier = ">=0.95.0,<1.0.0" },
+    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.12.0,<6.0.0" },
+    { name = "jinja2", specifier = ">=3.1.2,<4.0.0" },
+    { name = "langchain", specifier = ">=0.0.300,<1.0.0" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.1,<2.0.0" },
+    { name = "openai", specifier = ">=0.28.0,<1.0.0" },
+    { name = "pdfplumber", specifier = ">=0.10.0,<1.0.0" },
+    { name = "pydantic", specifier = ">=1.10.11,<2.0.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0,<8.0.0" },
+    { name = "python-docx", specifier = ">=0.8.11,<1.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "sqlalchemy", specifier = ">=1.4,<2.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.22.0,<1.0.0" },
+]
+provides-extras = ["dev"]
+
+[[package]]
 name = "build"
 version = "1.2.2.post1"
 source = { registry = "https://pypi.org/simple" }
@@ -1959,53 +2008,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/ce/37/dca4c8290c252f530
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e6/c4/d2e09fbc937d1f76baae34e526662cc718e23a904321bf4a40282d190033/pdfplumber-0.11.6-py3-none-any.whl", hash = "sha256:169fc2b8dbf328c81a4e9bab30af0c304ad4b472fd7816616eabdb79dc5d9d17", size = 60233, upload_time = "2025-03-28T03:19:00.929Z" },
 ]
-
-[[package]]
-name = "petit"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "chromadb" },
-    { name = "fastapi" },
-    { name = "jinja2" },
-    { name = "langchain", version = "0.2.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12.4'" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12.4'" },
-    { name = "openai" },
-    { name = "pdfplumber" },
-    { name = "pydantic" },
-    { name = "python-docx" },
-    { name = "python-multipart" },
-    { name = "sqlalchemy" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "black" },
-    { name = "isort" },
-    { name = "mypy" },
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "black", marker = "extra == 'dev'", specifier = ">=24.3.0,<25.0.0" },
-    { name = "chromadb", specifier = ">=0.3.31,<1.0.0" },
-    { name = "fastapi", specifier = ">=0.95.0,<1.0.0" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.12.0,<6.0.0" },
-    { name = "jinja2", specifier = ">=3.1.2,<4.0.0" },
-    { name = "langchain", specifier = ">=0.0.300,<1.0.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.1,<2.0.0" },
-    { name = "openai", specifier = ">=0.28.0,<1.0.0" },
-    { name = "pdfplumber", specifier = ">=0.10.0,<1.0.0" },
-    { name = "pydantic", specifier = ">=1.10.11,<2.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.4.0,<8.0.0" },
-    { name = "python-docx", specifier = ">=0.8.11,<1.0.0" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "sqlalchemy", specifier = ">=1.4,<2.0" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.22.0,<1.0.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "pillow"
