@@ -85,6 +85,4 @@ Copyright © 2025, Iwan van der Kleijn
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
 
-Let me know if you want a more playful Top Gun reference or even more minimal/technical wording!
