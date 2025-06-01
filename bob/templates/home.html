@@ -94,7 +94,7 @@
         {% endfor %}
       </div>
      
-      <form hx-post="/conversations/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="w-full fixed bottom-0 left-0 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
+      <form hx-post="/conversations/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
         <input type="text" name="text" placeholder="Message Bob..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
         <button type="submit" class="bg-[#dce8f3] text-[#121416] px-6 py-2 rounded-full font-semibold text-sm">Send</button>
       </form>
