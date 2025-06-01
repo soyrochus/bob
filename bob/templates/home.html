@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>body{font-family:'Inter','Noto Sans',sans-serif;}</style>
 </head>
 <body class="bg-[#f7f8fa] min-h-screen w-full">
@@ -115,19 +116,24 @@
 </div>
 <div>
   <div class="text-[#6a7681] text-xs mb-1">Bob</div>
-  <div class="bg-[#f1f2f4] rounded-xl px-4 py-3 text-[#121416] max-w-xl"><span class="bob-text"></span></div>
+  <div class="bg-[#f1f2f4] rounded-xl px-4 py-3 text-[#121416] max-w-xl"><span class="bob-text markdown-body"></span></div>
 </div>`;
           container.appendChild(wrapper);
           const textSpan = wrapper.querySelector('.bob-text');
           const source = new EventSource(`/conversations/${convId}/stream?user_msg_id=${msgId}`);
+          let fullText = '';
           source.onmessage = (event) => {
             if (event.data === '[DONE]') {
               source.close();
             } else {
-              textSpan.textContent += event.data;
+              fullText += event.data;
+              textSpan.innerHTML = marked.parse(fullText);
             }
           };
         }
+        document.querySelectorAll('.markdown-body').forEach(el => {
+          el.innerHTML = marked.parse(el.textContent);
+        });
       </script>
   
     </section>
