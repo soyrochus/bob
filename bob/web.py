@@ -1,10 +1,11 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
 from fastapi import FastAPI, Request, Form, Depends
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from starlette.middleware.sessions import SessionMiddleware
 
 from .db import SessionLocal, engine
 from .models import Base, User, Conversation, Message
@@ -14,6 +15,9 @@ from .chatgpt import stream_chat
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Signed cookie session for login state
+app.add_middleware(SessionMiddleware, secret_key="change-me")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -28,19 +32,37 @@ def get_db():
         db.close()
 
 
-async def get_or_create_user(db: Session) -> User:
-    user = db.query(User).first()
+def get_current_user(request: Request, db: Session) -> User | None:
+    user_id = request.session.get("user_id")
+    if user_id:
+        return db.query(User).filter(User.id == user_id).first()
+    return None
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@app.post("/login", response_class=HTMLResponse)
+async def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == username).first()
     if not user:
-        user = User(name="Ethan")
+        user = User(username=username, password=password, name=username)
         db.add(user)
         db.commit()
         db.refresh(user)
-    return user
+    elif user.password != password:
+        return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
+    request.session["user_id"] = user.id
+    return RedirectResponse("/", status_code=302)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, db: Session = Depends(get_db)):
-    user = await get_or_create_user(db)
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse("/login")
     conversations = (
         db.query(Conversation)
         .filter(Conversation.user_id == user.id)
@@ -71,7 +93,9 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/conversations/{conv_id}", response_class=HTMLResponse)
 async def read_conversation(conv_id: int, request: Request, db: Session = Depends(get_db)):
-    user = await get_or_create_user(db)
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse("/login")
     conversations = (
         db.query(Conversation)
         .filter(Conversation.user_id == user.id)
@@ -92,8 +116,10 @@ async def read_conversation(conv_id: int, request: Request, db: Session = Depend
 
 
 @app.post("/conversations/{conv_id}/message", response_class=HTMLResponse)
-async def send_message(conv_id: int, text: str = Form(...), db: Session = Depends(get_db)):
+async def send_message(request: Request, conv_id: int, text: str = Form(...), db: Session = Depends(get_db)):
     """Store the user message and initiate streaming of the assistant reply."""
+    if not get_current_user(request, db):
+        return RedirectResponse("/login")
     conv = db.query(Conversation).filter(Conversation.id == conv_id).first()
     if not conv:
         return ""
@@ -110,8 +136,12 @@ async def send_message(conv_id: int, text: str = Form(...), db: Session = Depend
 
 
 @app.get("/conversations/{conv_id}/stream")
-async def stream_response(conv_id: int, user_msg_id: int, db: Session = Depends(get_db)):
+async def stream_response(request: Request, conv_id: int, user_msg_id: int, db: Session = Depends(get_db)):
     """Stream the assistant response for the given conversation."""
+    if not get_current_user(request, db):
+        async def empty():
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(empty(), media_type="text/event-stream")
     conv = db.query(Conversation).filter(Conversation.id == conv_id).first()
     user_msg = db.query(Message).filter(Message.id == user_msg_id).first()
     if not conv or not user_msg:
@@ -145,7 +175,9 @@ async def stream_response(conv_id: int, user_msg_id: int, db: Session = Depends(
 
 @app.post("/new-conversation", response_class=HTMLResponse)
 async def new_conversation(request: Request, db: Session = Depends(get_db)):
-    user = await get_or_create_user(db)
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse("/login")
     conv = Conversation(title="New Conversation", user_id=user.id)
     db.add(conv)
     db.commit()
@@ -158,7 +190,9 @@ async def new_conversation(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/conversations/search", response_class=HTMLResponse)
 async def search_conversations(q: str, request: Request, db: Session = Depends(get_db)):
-    user = await get_or_create_user(db)
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse("/login")
     conversations = (
         db.query(Conversation)
         .filter(
@@ -180,15 +214,27 @@ async def search_conversations(q: str, request: Request, db: Session = Depends(g
 
 # Mock pages
 @app.get("/training", response_class=HTMLResponse)
-async def training(request: Request):
+async def training(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request, db):
+        return RedirectResponse("/login")
     return templates.TemplateResponse("mock.html", {"request": request, "title": "Training"})
 
 
 @app.get("/resources", response_class=HTMLResponse)
-async def resources(request: Request):
+async def resources(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request, db):
+        return RedirectResponse("/login")
     return templates.TemplateResponse("mock.html", {"request": request, "title": "Resources"})
 
 
 @app.get("/profile", response_class=HTMLResponse)
-async def profile(request: Request):
+async def profile(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request, db):
+        return RedirectResponse("/login")
     return templates.TemplateResponse("mock.html", {"request": request, "title": "Profile"})
+
+
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse("/login")
