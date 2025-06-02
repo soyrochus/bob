@@ -11,7 +11,11 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String)
+    username = Column(String, unique=True, index=True)
+    # NOTE: Passwords are stored in plain text for this prototype.
+    # In production this should be hashed and salted.
+    password = Column(String)
 
     conversations = relationship("Conversation", back_populates="user")
 

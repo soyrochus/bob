@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <style>body{font-family:'Inter','Noto Sans',sans-serif;}</style>
+</head>
+<body class="bg-[#f7f8fa] min-h-screen flex items-center justify-center">
+  <form method="post" class="bg-white p-6 rounded-xl shadow w-80 space-y-4">
+    {% if error %}
+      <div class="text-red-600 text-sm">{{ error }}</div>
+    {% endif %}
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Username</label>
+      <input type="text" name="username" class="mt-1 block w-full rounded-md bg-[#f1f2f4] border-none focus:ring-0" required>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Password</label>
+      <input type="password" name="password" class="mt-1 block w-full rounded-md bg-[#f1f2f4] border-none focus:ring-0" required>
+    </div>
+    <button type="submit" class="w-full bg-[#dce8f3] text-[#121416] px-4 py-2 rounded-full font-semibold">Login</button>
+  </form>
+</body>
+</html>
