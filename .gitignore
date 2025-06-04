@@ -20,3 +20,6 @@ db/
 data/
 
 
+# Node js
+node_modules/
+    
