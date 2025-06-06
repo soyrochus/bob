@@ -268,6 +268,7 @@ source = { editable = "." }
 dependencies = [
     { name = "chromadb" },
     { name = "fastapi" },
+    { name = "itsdangerous" },
     { name = "jinja2" },
     { name = "langchain", version = "0.2.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12.4'" },
     { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12.4'" },
@@ -295,6 +296,7 @@ requires-dist = [
     { name = "chromadb", specifier = ">=0.3.31,<1.0.0" },
     { name = "fastapi", specifier = ">=0.95.0,<1.0.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.12.0,<6.0.0" },
+    { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "jinja2", specifier = ">=3.1.2,<4.0.0" },
     { name = "langchain", specifier = ">=0.0.300,<1.0.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.5.1,<2.0.0" },
@@ -1074,6 +1076,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/87/f9/c1eb8635a24e87ade2efce21e3ce8cd6b8630bb685ddc9cdaca1349b2eb5/isort-5.13.2.tar.gz", hash = "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109", size = 175303, upload_time = "2023-12-13T20:37:26.124Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d1/b3/8def84f539e7d2289a02f0524b944b15d7c75dab7628bedf1c4f0992029c/isort-5.13.2-py3-none-any.whl", hash = "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6", size = 92310, upload_time = "2023-12-13T20:37:23.244Z" },
+]
+
+[[package]]
+name = "itsdangerous"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/cb/8ac0172223afbccb63986cc25049b154ecfb5e85932587206f42317be31d/itsdangerous-2.2.0.tar.gz", hash = "sha256:e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173", size = 54410, upload_time = "2024-04-16T21:28:15.614Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/04/96/92447566d16df59b2a776c0fb82dbc4d9e07cd95062562af01e408583fc4/itsdangerous-2.2.0-py3-none-any.whl", hash = "sha256:c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef", size = 16234, upload_time = "2024-04-16T21:28:14.499Z" },
 ]
 
 [[package]]
