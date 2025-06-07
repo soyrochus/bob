@@ -21,6 +21,8 @@ dependencies = [
   "python-multipart>=0.0.20",
   "sqlalchemy>=1.4,<2.0",
   "python-dotenv>=1.0.0",
+  "bleach>=6.0.0,<7.0.0",
+  "markupsafe>=2.1.0,<3.0.0",
 ]
 
 [project.optional-dependencies]

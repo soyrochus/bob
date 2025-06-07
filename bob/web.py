@@ -11,6 +11,7 @@ from .db import SessionLocal, engine
 from .models import Base, User, Conversation, Message
 from .schemas import MessageCreate
 from .chatgpt import stream_chat
+from .token_expander import expand_tokens
 
 Base.metadata.create_all(bind=engine)
 
@@ -80,6 +81,8 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
         conv = conversations[0]
 
     messages = conv.messages if conv else []
+    for m in messages:
+        m.html = expand_tokens(m.text)
     return templates.TemplateResponse(
         "home.html",
         {
@@ -104,6 +107,8 @@ async def read_conversation(conv_id: int, request: Request, db: Session = Depend
     )
     conv = db.query(Conversation).filter(Conversation.id == conv_id).first()
     messages = conv.messages if conv else []
+    for m in messages:
+        m.html = expand_tokens(m.text)
     return templates.TemplateResponse(
         "home.html",
         {
@@ -128,6 +133,7 @@ async def send_message(request: Request, conv_id: int, text: str = Form(...), db
     db.add(user_msg)
     db.commit()
     db.refresh(user_msg)
+    user_msg.html = expand_tokens(user_msg.text)
 
     return templates.TemplateResponse(
         "partials/user_message_and_stream.html",
