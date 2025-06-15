@@ -1,6 +1,7 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
 import json
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Form, Request
@@ -18,9 +19,15 @@ from .schemas import MessageCreate
 from .llm import stream_tokens
 from .token_expander import expand_tokens
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
 
-# Signed cookie session for login state
+app = FastAPI(lifespan=lifespan)
+
+
 app.add_middleware(SessionMiddleware, secret_key="change-me")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -164,18 +171,24 @@ async def stream_response(request: Request, conv_id: int, user_msg_id: int, db: 
     for msg in history:
         role = "assistant" if msg.sender == "bob" else "user"
         messages.append({"role": role, "content": msg.text})
+
     async def event_generator():
         full_text = ""
         async for chunk in stream_tokens(messages):
             full_text += chunk
             yield f"data: {chunk}\n\n"
+        # Save to DB before yielding [DONE]
+        from .db import SessionLocal
+        from sqlalchemy.ext.asyncio import AsyncSession
+        async with SessionLocal() as new_session:
+            bob_msg = Message()
+            bob_msg.conversation_id = conv.id
+            bob_msg.sender = "bob"
+            bob_msg.text = full_text
+            new_session.add(bob_msg)
+            await new_session.commit()
         yield "data: [DONE]\n\n"
-        bob_msg = Message()
-        bob_msg.conversation_id = conv.id
-        bob_msg.sender = "bob"
-        bob_msg.text = full_text
-        db.add(bob_msg)
-        await db.commit()
+
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
@@ -247,10 +260,3 @@ async def logout(request: Request):
     return RedirectResponse("/login")
 
 
-# Fix async model creation
-async def init_models():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-import asyncio
-asyncio.run(init_models())
