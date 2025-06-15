@@ -1,5 +1,5 @@
 {% for conv in conversations %}
-  <a href="/conversations/{{ conv.id }}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if active_conversation and active_conversation.id == conv.id %}bg-[#f1f2f4]{% else %}hover:bg-[#f1f2f4]{% endif %} cursor-pointer">
+  <a href="/{{ conv.id }}" class="flex items-center gap-3 px-3 py-2 rounded-lg {% if active_conversation and active_conversation.id == conv.id %}bg-[#f1f2f4]{% else %}hover:bg-[#f1f2f4]{% endif %} cursor-pointer">
     <div>
       <p class="text-[#121416] text-sm font-medium">{{ conv.title }}</p>
       <p class="text-[#6a7681] text-xs">{{ conv.created_at.strftime('%Y-%m-%d %H:%M') }}</p>

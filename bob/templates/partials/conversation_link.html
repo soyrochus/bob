@@ -1,4 +1,4 @@
-<a href="/conversations/{{ conv.id }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
+<a href="/{{ conv.id }}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f1f2f4] transition">
   <div class="flex flex-col">
     <p class="text-[#121416] text-sm font-medium">{{ conv.title }}</p>
     <p class="text-[#6a7681] text-xs">{{ conv.created_at.strftime('%Y-%m-%d %H:%M') }}</p>

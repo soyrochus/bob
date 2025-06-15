@@ -50,8 +50,8 @@
     <div class="mt-2">
       <h3 class="text-[#121416] text-[16px] font-bold mb-3">Chat History</h3>
       <div class="mb-2 flex items-center justify-between">
-        <button hx-post="/new-conversation" hx-target="#conversation-list" hx-swap="afterbegin" class="px-2 py-1 rounded text-sm bg-[#f1f2f4]">+ New</button>
-        <input hx-get="/conversations/search" hx-target="#conversation-list" hx-trigger="keyup changed delay:300ms" name="q" type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0 ml-2" />
+        <button hx-post="/new" hx-target="#conversation-list" hx-swap="afterbegin" class="px-2 py-1 rounded text-sm bg-[#f1f2f4]">+ New</button>
+        <input hx-get="/search" hx-target="#conversation-list" hx-trigger="keyup changed delay:300ms" name="q" type="text" placeholder="Search conversations" class="w-full px-3 py-2 rounded-xl bg-[#f1f2f4] text-sm border-none focus:ring-0 ml-2" />
       </div>
       <div id="conversation-list" class="flex flex-col gap-1">
         {% include 'partials/conversation_list.html' with context %}
@@ -78,7 +78,7 @@
         {% endfor %}
       </div>
      
-      <form hx-post="/conversations/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
+      <form hx-post="/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
         <input type="text" name="text" placeholder="Message Bob..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
         <button type="submit" class="bg-[#dce8f3] text-[#121416] px-6 py-2 rounded-full font-semibold text-sm">Send</button>
       </form>

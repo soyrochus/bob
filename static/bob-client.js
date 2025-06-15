@@ -18,7 +18,7 @@ function startStream(convId, msgId) {
 </div>`;
   container.appendChild(wrapper);
   const textSpan = wrapper.querySelector('.bob-text');
-  const source = new EventSource(`/conversations/${convId}/stream?user_msg_id=${msgId}`);
+  const source = new EventSource(`/${convId}/stream?user_msg_id=${msgId}`);
   let fullText = '';
   source.onmessage = (event) => {
     if (event.data === '[DONE]') {

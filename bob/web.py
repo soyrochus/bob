@@ -4,26 +4,34 @@ import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
+from fastapi import APIRouter, Depends, Form, Request, FastAPI
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession # Ensure AsyncSession is imported
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exceptions import RequestValidationError
 
-from .db import SessionLocal, engine, Base
-from .models import User, Conversation, Message
-from .schemas import MessageCreate
-from .llm import stream_tokens
-from .token_expander import expand_tokens
+
+from .db import engine, Base
+from .models import User
+from .shared import templates, HOME_PANELS, get_db, get_current_user # get_current_user is now a direct async function
+from .conversations.routers import router as conversations_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    print("Lifespan start, attempting to create tables.")
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("Tables should be created.")
+    except Exception as e:
+        print(f"Error during table creation: {e}")
     yield
+    print("Lifespan end, disposing engine.")
+    await engine.dispose()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -32,23 +40,14 @@ app.add_middleware(SessionMiddleware, secret_key="change-me")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-templates = Jinja2Templates(directory="bob/templates")
-HOME_PANELS = json.loads((Path(__file__).resolve().parent.parent / "home-panels.json").read_text())
 
+@app.exception_handler(StarletteHTTPException)
+async def custom_404_handler(request: Request, exc: StarletteHTTPException):
+    return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
 
-# Fix get_db to be an async generator
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
-
-
-# Refactor get_current_user to async
-async def get_current_user(request: Request, db: AsyncSession) -> User | None:
-    user_id = request.session.get("user_id")
-    if user_id:
-        result = await db.execute(select(User).where(User.id == user_id))
-        return result.scalars().first()
-    return None
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return templates.TemplateResponse("422.html", {"request": request}, status_code=422)
 
 
 @app.get("/login", response_class=HTMLResponse)
@@ -66,168 +65,7 @@ async def login(request: Request, username: str = Form(...), password: str = For
     return RedirectResponse("/", status_code=302)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        return RedirectResponse("/login")
-    result = await db.execute(
-        select(Conversation)
-        .options(selectinload(Conversation.messages))
-        .where(Conversation.user_id == user.id)
-        .order_by(Conversation.created_at.desc())
-    )
-    conversations = result.scalars().all()
-    conv = conversations[0] if conversations else None
-    messages = conv.messages if conv else []
-    for m in messages:
-        m.html = expand_tokens(m.text)
-    return templates.TemplateResponse(
-        "home.html",
-        {
-            "request": request,
-            "conversations": conversations,
-            "active_conversation": conv,
-            "messages": messages,
-            "home_panels": HOME_PANELS,
-        },
-    )
-
-
-@app.get("/conversations/{conv_id}", response_class=HTMLResponse)
-async def read_conversation(conv_id: int, request: Request, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        return RedirectResponse("/login")
-    result = await db.execute(
-        select(Conversation)
-        .options(selectinload(Conversation.messages))
-        .where(Conversation.user_id == user.id)
-        .order_by(Conversation.created_at.desc())
-    )
-    conversations = result.scalars().all()
-    result = await db.execute(
-        select(Conversation)
-        .options(selectinload(Conversation.messages))
-        .where(Conversation.id == conv_id)
-    )
-    conv = result.scalars().first()
-    messages = conv.messages if conv else []
-    for m in messages:
-        m.html = expand_tokens(m.text)
-    return templates.TemplateResponse(
-        "home.html",
-        {
-            "request": request,
-            "conversations": conversations,
-            "active_conversation": conv,
-            "messages": messages,
-            "home_panels": HOME_PANELS,
-        },
-    )
-
-
-@app.post("/conversations/{conv_id}/message", response_class=HTMLResponse)
-async def send_message(request: Request, conv_id: int, text: str = Form(...), db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        return RedirectResponse("/login")
-    result = await db.execute(select(Conversation).where(Conversation.id == conv_id))
-    conv = result.scalars().first()
-    if not conv:
-        return ""
-    user_msg = Message()
-    user_msg.conversation_id = conv.id
-    user_msg.sender = "user"
-    user_msg.text = text
-    db.add(user_msg)
-    await db.commit()
-    await db.refresh(user_msg)
-    user_msg.html = expand_tokens(user_msg.text)
-    return templates.TemplateResponse(
-        "partials/user_message_and_stream.html",
-        {"request": {}, "msg": user_msg, "conv_id": conv.id},
-    )
-
-
-@app.get("/conversations/{conv_id}/stream")
-async def stream_response(request: Request, conv_id: int, user_msg_id: int, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        async def empty():
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(empty(), media_type="text/event-stream")
-    result = await db.execute(select(Conversation).where(Conversation.id == conv_id))
-    conv = result.scalars().first()
-    result = await db.execute(select(Message).where(Message.id == user_msg_id))
-    user_msg = result.scalars().first()
-    if not conv or not user_msg:
-        async def empty():
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(empty(), media_type="text/event-stream")
-    result = await db.execute(select(Message).where(Message.conversation_id == conv.id).order_by(Message.created_at))
-    history = result.scalars().all()
-    messages = [{"role": "system", "content": "You are Bob, an AI assistant."}]
-    for msg in history:
-        role = "assistant" if msg.sender == "bob" else "user"
-        messages.append({"role": role, "content": msg.text})
-
-    async def event_generator():
-        full_text = ""
-        async for chunk in stream_tokens(messages):
-            full_text += chunk
-            yield f"data: {chunk}\n\n"
-        # Save to DB before yielding [DONE]
-        from .db import SessionLocal
-        from sqlalchemy.ext.asyncio import AsyncSession
-        async with SessionLocal() as new_session:
-            bob_msg = Message()
-            bob_msg.conversation_id = conv.id
-            bob_msg.sender = "bob"
-            bob_msg.text = full_text
-            new_session.add(bob_msg)
-            await new_session.commit()
-        yield "data: [DONE]\n\n"
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
-
-
-@app.post("/new-conversation", response_class=HTMLResponse)
-async def new_conversation(request: Request, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        return RedirectResponse("/login")
-    conv = Conversation()
-    conv.title = "New Conversation"
-    conv.user_id = user.id
-    db.add(conv)
-    await db.commit()
-    await db.refresh(conv)
-    return templates.TemplateResponse(
-        "partials/new_conversation.html",
-        {"request": request, "conv": conv},
-    )
-
-
-@app.get("/conversations/search", response_class=HTMLResponse)
-async def search_conversations(q: str, request: Request, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
-    if not user:
-        return RedirectResponse("/login")
-    result = await db.execute(select(Conversation).where(
-        Conversation.user_id == user.id,
-        Conversation.title.ilike(f"%{q}%")
-    ).order_by(Conversation.created_at.desc()))
-    conversations = result.scalars().all()
-    return templates.TemplateResponse(
-        "partials/conversation_list.html",
-        {
-            "request": request,
-            "conversations": conversations,
-            "active_conversation": None,
-        },
-    )
-
+# Only keep mock and login/logout endpoints here
 
 # Mock pages
 @app.get("/training", response_class=HTMLResponse)
@@ -258,5 +96,15 @@ async def profile(request: Request, db: AsyncSession = Depends(get_db)):
 async def logout(request: Request):
     request.session.clear()
     return RedirectResponse("/login")
+
+
+@app.get("/debug", response_class=HTMLResponse)
+async def debug(request: Request, db: AsyncSession = Depends(get_db)):
+    user = await get_current_user(request, db)
+    return HTMLResponse(f"<pre>Session: {request.session}\\\\nUser: {user}</pre>")
+
+# Include the conversations router
+app.include_router(conversations_router)
+
 
 
