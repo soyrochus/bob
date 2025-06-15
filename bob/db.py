@@ -1,14 +1,18 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from .settings import settings
 
-engine = create_engine(
-    settings.DATABASE_URL, connect_args={"check_same_thread": False}
+engine = create_async_engine(
+    settings.DATABASE_URL, echo=False
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 Base = declarative_base()

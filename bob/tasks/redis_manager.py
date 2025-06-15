@@ -1,3 +1,4 @@
+# Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 from __future__ import annotations
 
 import json
@@ -5,9 +6,9 @@ import uuid
 
 from redis.asyncio import Redis
 
-from .models import JobResponse, StatusEnum
-from .settings import settings
-from .task_manager import TaskManager
+from ..models import JobResponse, StatusEnum
+from ..settings import settings
+from . import TaskManager
 
 
 class RedisTasksManager(TaskManager):

@@ -3,5 +3,7 @@
 """Bob web application."""
 
 from .web import app
+from .tasks.redis_manager import RedisTasksManager
+from .tasks.sqlite_manager import SingletonTasksManager
 
 __all__ = ["app"]

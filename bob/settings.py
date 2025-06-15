@@ -1,21 +1,30 @@
-from __future__ import annotations
+# Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
 from functools import lru_cache
+import os
 
 from dotenv import load_dotenv
-from pydantic import BaseSettings
 
 load_dotenv()
 
 
-class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./db/bob.db"
-    OPENAI_API_KEY: str | None = None
-    OPENAI_MODEL: str = "gpt-4"
-    HOST: str = "0.0.0.0"
-    PORT: int = 8000
-    LLM_PROVIDER: str = "openai"
-    REDIS_URL: str = "redis://localhost:6379/0"
+class Settings:
+    DATABASE_URL: str
+    OPENAI_API_KEY: str | None
+    OPENAI_MODEL: str
+    HOST: str
+    PORT: int
+    LLM_PROVIDER: str
+    REDIS_URL: str
+
+    def __init__(self):
+        self.DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./db/bob.db")
+        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", None)
+        self.OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+        self.HOST = os.getenv("HOST", "0.0.0.0")
+        self.PORT = int(os.getenv("PORT", 8000))
+        self.LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
+        self.REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 
 @lru_cache(maxsize=1)
