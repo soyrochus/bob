@@ -1,7 +1,11 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from enum import Enum
+from typing import Any, Optional
+
+from pydantic import BaseModel
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from .db import Base
@@ -42,3 +46,17 @@ class Message(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     conversation = relationship("Conversation", back_populates="messages")
+
+
+class StatusEnum(str, Enum):
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+
+
+class JobResponse(BaseModel):
+    job_id: str
+    status: StatusEnum
+    result: Optional[Any] = None
+    error: Optional[str] = None
