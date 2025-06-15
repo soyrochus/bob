@@ -53,15 +53,7 @@ async def login_page(request: Request):
 async def login(request: Request, username: str = Form(...), password: str = Form(...), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.username == username))
     user = result.scalars().first()
-    if not user:
-        user = User()
-        user.username = username
-        user.password = password
-        user.name = username
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
-    elif user.password != password:
+    if not user or user.password != password:
         return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
     request.session["user_id"] = user.id
     return RedirectResponse("/", status_code=302)
