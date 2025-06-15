@@ -30,12 +30,9 @@ HOME_PANELS = json.loads((Path(__file__).resolve().parent.parent / "home-panels.
 
 
 # Fix get_db to be an async generator
-def get_db():
-    session = SessionLocal()
-    try:
+async def get_db():
+    async with SessionLocal() as session:
         yield session
-    finally:
-        pass  # AsyncSession will be closed by FastAPI
 
 
 # Refactor get_current_user to async
