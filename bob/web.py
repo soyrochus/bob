@@ -1,16 +1,19 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
-from fastapi import FastAPI, Request, Form, Depends
-from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+import json
+from pathlib import Path
+
+from fastapi import Depends, FastAPI, Form, Request
+from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
 
 from .db import SessionLocal, engine
 from .models import Base, User, Conversation, Message
 from .schemas import MessageCreate
-from .chatgpt import stream_chat
+from .llm import stream_tokens
 from .token_expander import expand_tokens
 
 Base.metadata.create_all(bind=engine)
@@ -23,6 +26,7 @@ app.add_middleware(SessionMiddleware, secret_key="change-me")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="bob/templates")
+HOME_PANELS = json.loads((Path(__file__).resolve().parent.parent / "home-panels.json").read_text())
 
 
 def get_db():
@@ -90,6 +94,7 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
             "conversations": conversations,
             "active_conversation": conv,
             "messages": messages,
+            "home_panels": HOME_PANELS,
         },
     )
 
@@ -116,6 +121,7 @@ async def read_conversation(conv_id: int, request: Request, db: Session = Depend
             "conversations": conversations,
             "active_conversation": conv,
             "messages": messages,
+            "home_panels": HOME_PANELS,
         },
     )
 
@@ -168,7 +174,7 @@ async def stream_response(request: Request, conv_id: int, user_msg_id: int, db: 
 
     async def event_generator():
         full_text = ""
-        async for chunk in stream_chat(messages):
+        async for chunk in stream_tokens(messages):
             full_text += chunk
             yield f"data: {chunk}\n\n"
         yield "data: [DONE]\n\n"
