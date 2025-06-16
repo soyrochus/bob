@@ -26,6 +26,7 @@ dependencies = [
   "markupsafe>=2.1.0,<3.0.0",
   "redis>=6.2.0",
   "aiosqlite>=0.21.0",
+  "greenlet>=3.2.2",
 ]
 
 [project.optional-dependencies]
