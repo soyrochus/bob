@@ -1,89 +1,74 @@
-Here is a **clear, step-by-step prompt** to instruct a code generation agent to implement your requirements, focusing on clarity, ordering, and precision. This is written in a style directly consumable by an advanced code agent (e.g., GitHub Copilot Agents, OpenAI Code Interpreter, or similar “Codecs” agent).
-
----
-
 # Prompt: Implement UI and Memory Enhancements for Bob Portal
 
-**Overview:**
-Update the Bob Portal front-end and back-end to add multi-agent selection, per-conversation memory, and conversation renaming. Follow the detailed steps below. Use the design in `design/bog-portal.png` for UI reference where needed.
+**Objective:**
+Update the Bob Portal UI and back-end to add multi-agent selection, proper conversation memory handling (based on recent messages), and a rename conversation feature. See the steps and details below.
 
 ---
 
-## 1. Add Agent Selector to Message Form (Front-end)
+## 1. Agent Selector in Message Form (Front-end)
 
-* **Target File:** Home template (where the message input form is defined).
+* **Location:** Home template, within the message form section (see example block below).
+* **Change:**
 
-* **Context:**
-  You will find this block:
+  * Add a **button or pull-down menu** to the left side of the message input box for agent selection.
+  * Use pre-configured agent names (e.g., “Bob”, “Tutor”) as mock values.
+  * The selection should be visually present but does not need to affect message routing or logic yet—**purely a UI mockup for now**.
+  * Match styling/placement as shown in `design/bog-portal.png`.
 
   ```html
-  <form hx-post="/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
-      <input type="text" name="text" placeholder="Message Bob..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
-      <button type="submit" class="bg-[#dce8f3] text-[#121416] px-6 py-2 rounded-full font-semibold text-sm">Send</button>
+  <form ...>
+    <!-- [Add agent selector button/dropdown here] -->
+    <input ... />
+    <button ...>Send</button>
   </form>
   ```
 
-* **Required Change:**
+---
 
-  * On the left side of the message input box, add a **button or dropdown** to select from different pre-configured agents.
-  * This should appear visually as a button or pull-down, **before** the text input field.
-  * The menu should **not trigger any functionality yet**—use mock values (e.g., “Default”, “Tutor”) and make it non-interactive (for now just selects agent visually, no logic).
-  * Follow the UI style and spacing in `design/bog-portal.png` as closely as possible.
+## 2. Per-Conversation Memory as Latest N Messages
+
+* **Concept:**
+  Memory for a conversation is **not a separate database field**. Instead, it is composed of the latest N messages belonging to that conversation. These are used as conversational context (history) when sending prompts to the LLM.
+* **Implementation Steps:**
+
+  1. **Configurable N:**
+
+     * The number N (e.g., N=20) determines how many of the most recent messages are included in the context window for the LLM.
+     * For now, hardcode N to a reasonable value (e.g., 20), but structure code so it can be easily made configurable.
+  2. **Fetching History:**
+
+     * When preparing the input for the LLM, **query the last N messages** for the active conversation, ordered by timestamp.
+     * Construct the LLM prompt or message context using these messages, maintaining their chronological order.
+  3. **Passing to LLM:**
+
+     * Ensure that only these N messages (not all history, nor global messages) are passed as the conversational context to the LLM API.
+     * Update any related message processing, serialization, or context-building logic.
+  4. **No Separate Memory Field:**
+
+     * Do **not** add or use a memory field in the conversation model—memory is always dynamically constructed from existing message history.
 
 ---
 
-## 2. Implement Per-Conversation Memory (Back-end)
+## 3. Conversation Rename Feature (UI & API)
 
-* **Requirement:**
-  Each conversation instance must have its own memory, i.e., a memory object or structure attached to each conversation.
-* **Changes:**
+* **UI:**
 
-  1. **Data Model:**
+  * In the conversation menu/list (usually on the left), add a **rename button** for each conversation.
+  * When clicked, show a modal/popup with:
 
-     * Ensure that the Conversation model has an associated memory field or mechanism (can be a JSON column, a related table, or similar structure).
-     * The memory should persist conversation history or other relevant memory states.
-  2. **Message Passing:**
-
-     * When sending a message to the LLM (large language model), **inject only the memory relevant to the active conversation** (not global or cross-conversation memory).
-     * Update any logic where the LLM is called to use the conversation’s memory loop/structure.
-     * Ensure proper read/write/update for this memory at each user interaction (message sent/received).
-  3. **Migration:**
-
-     * If a migration is required, create a migration script for the new memory field.
-
----
-
-## 3. Conversation Rename Feature (UI and API)
-
-* **Left-side Menu Change:**
-
-  * In the conversation list/menu, add a **button next to each conversation to rename** it.
-  * When clicked, display a pop-up/modal allowing the user to edit the conversation name.
-  * The modal should have:
-
-    * A text input (pre-filled with the current conversation name)
+    * A text input pre-filled with the current name
     * “OK” and “Cancel” buttons
+* **Backend/API:**
 
-* **Front-end/Back-end Integration:**
-
-  * On “OK”:
-
-    * Call a **service endpoint** to update the conversation’s name in the database.
-    * On success, update the UI to reflect the new name.
-  * On “Cancel”:
-
-    * Close the modal without making changes.
-  * Implement all necessary endpoints, API logic, and error handling.
+  * On “OK,” call an endpoint to update the conversation’s name in the database.
+  * On success, update the UI.
+  * On “Cancel,” simply close the popup.
+  * Implement error handling as needed.
 
 ---
 
 ## General Notes
 
-* Maintain existing styles and component structures.
-* All new UI elements must match the look and feel of the existing portal (reference `design/bog-portal.png`).
-* For any code that is “mock” or placeholder, clearly mark as such with a TODO comment.
-* Ensure all new features are covered by minimal tests.
-
----
-
-**End of prompt.**
+* Follow existing UI/UX conventions; refer to `design/bog-portal.png` for style and layout.
+* Clearly label any UI elements or logic that are mock/stub with `TODO` comments.
+* Minimal tests to cover changes are recommended.
