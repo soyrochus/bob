@@ -1,0 +1,5 @@
+site_name: Bob - AI-Powered Learning and Productivity Portal
+theme:
+  name: material
+nav:
+  - Home: index.md

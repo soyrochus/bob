@@ -19,6 +19,8 @@ wheels/
 db/
 data/
 
+# Documentation builds
+site/
 
 # Node js
 node_modules/

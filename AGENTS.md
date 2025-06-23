@@ -1,74 +1,114 @@
-# Prompt: Implement UI and Memory Enhancements for Bob Portal
+## Instruction Prompt for Extending LLM Provider Model with Agent Selector
 
-**Objective:**
-Update the Bob Portal UI and back-end to add multi-agent selection, proper conversation memory handling (based on recent messages), and a rename conversation feature. See the steps and details below.
+### Context
 
----
+The system currently has an LLM provider model in `LLM.py` based on OpenAI, and a frontend select box (select tag with "agent" name) in the send bar (home.html temlate), currently offering "default" and "tutor" as choices. The backend logic for processing messages is handled in the `stream_agent_response` function in the middleware. You want to extend this so that:
 
-## 1. Agent Selector in Message Form (Front-end)
+* The provider model supports **multiple agent implementations**.
+* Agent selection is dynamic based on user input from the frontend (the agent selector).
+* The provider model becomes modular, supporting different agent strategies without breaking the existing "default" (OpenAI) behavior.
 
-* **Location:** Home template, within the message form section (see example block below).
-* **Change:**
+### Required Changes
 
-  * Add a **button or pull-down menu** to the left side of the message input box for agent selection.
-  * Use pre-configured agent names (e.g., “Bob”, “Tutor”) as mock values.
-  * The selection should be visually present but does not need to affect message routing or logic yet—**purely a UI mockup for now**.
-  * Match styling/placement as shown in `design/bog-portal.png`.
+1. **Frontend: Agent Selector**
 
-  ```html
-  <form ...>
-    <!-- [Add agent selector button/dropdown here] -->
-    <input ... />
-    <button ...>Send</button>
-  </form>
-  ```
+   * Change the agent selector box values to: `default`, `Bob`, and `tutor`.
+   * Ensure that the **selected value** is sent with every backend request as an agent selection parameter.
 
----
+2. **Backend: Middleware/stream_agent_response**
 
-## 2. Per-Conversation Memory as Latest N Messages
+   * In `stream_agent_response`, receive the agent selector value with each request.
+   * Use this value to **dynamically select the corresponding agent implementation**.
 
-* **Concept:**
-  Memory for a conversation is **not a separate database field**. Instead, it is composed of the latest N messages belonging to that conversation. These are used as conversational context (history) when sending prompts to the LLM.
-* **Implementation Steps:**
+3. **Backend: LLM Provider Model Refactor**
 
-  1. **Configurable N:**
+   * **Do NOT replace** the current OpenAI LLM provider. Instead, refactor the provider logic to support **multiple agent types** via a common interface or strategy pattern.
+   * Implement three agent classes (or strategies):
 
-     * The number N (e.g., N=20) determines how many of the most recent messages are included in the context window for the LLM.
-     * For now, hardcode N to a reasonable value (e.g., 20), but structure code so it can be easily made configurable.
-  2. **Fetching History:**
+     * **DefaultAgent**: Uses the current OpenAI LLM provider implementation (no changes to this path).
+     * **BobAgent**:
 
-     * When preparing the input for the LLM, **query the last N messages** for the active conversation, ordered by timestamp.
-     * Construct the LLM prompt or message context using these messages, maintaining their chronological order.
-  3. **Passing to LLM:**
+       * Uses the same LLM provider as DefaultAgent.
+       * Adds a RAG (Retrieval Augmented Generation) connector based on a local vector database (initially Chroma, via LangChain).
+       * On receiving a prompt:
 
-     * Ensure that only these N messages (not all history, nor global messages) are passed as the conversational context to the LLM API.
-     * Update any related message processing, serialization, or context-building logic.
-  4. **No Separate Memory Field:**
+         1. Query the vector database for relevant context using LangChain.
+         2. Combine retrieved context with the original prompt.
+         3. Send the composed prompt to the LLM provider and return the response.
+       * The configuration for Chroma should be separated for future customization.
+     * **TutorAgent**:
 
-     * Do **not** add or use a memory field in the conversation model—memory is always dynamically constructed from existing message history.
+       * For now, implement TutorAgent as an alias/wrapper for BobAgent (same logic).
+       * Expose as a separate implementation to be extended later.
 
----
+4. **Design/Implementation Principles**
 
-## 3. Conversation Rename Feature (UI & API)
+   * **Provider Model** should be extensible; new agents should be easy to add.
+   * Use a **factory** or **strategy pattern** to select the agent implementation based on the selector value.
+   * All agent classes must conform to a shared interface or abstract base (e.g., `.generate(prompt)`).
+   * Separate all configuration parameters (e.g., vector DB connection details) from core logic for maintainability.
 
-* **UI:**
+5. **Testing/Documentation**
 
-  * In the conversation menu/list (usually on the left), add a **rename button** for each conversation.
-  * When clicked, show a modal/popup with:
-
-    * A text input pre-filled with the current name
-    * “OK” and “Cancel” buttons
-* **Backend/API:**
-
-  * On “OK,” call an endpoint to update the conversation’s name in the database.
-  * On success, update the UI.
-  * On “Cancel,” simply close the popup.
-  * Implement error handling as needed.
+   * Add comments explaining agent selection and extension points for future agents.
+   * Briefly document how new agent types can be registered and selected.
 
 ---
 
-## General Notes
+### Example Implementation Outline
 
-* Follow existing UI/UX conventions; refer to `design/bog-portal.png` for style and layout.
-* Clearly label any UI elements or logic that are mock/stub with `TODO` comments.
-* Minimal tests to cover changes are recommended.
+
+```python
+# Abstract interface for agents
+class BaseAgent:
+    def generate(self, prompt: str) -> str:
+        raise NotImplementedError()
+
+# Default agent - current OpenAI LLM logic
+class DefaultAgent(BaseAgent):
+    def generate(self, prompt: str) -> str:
+        # Current implementation
+        ...
+
+# Bob agent - RAG-enabled
+class BobAgent(BaseAgent):
+    def __init__(self, llm_provider, vector_db):
+        self.llm = llm_provider
+        self.vector_db = vector_db
+
+    def generate(self, prompt: str) -> str:
+        context = self.vector_db.query(prompt)
+        composed_prompt = f"{context}\n{prompt}"
+        return self.llm.generate(composed_prompt)
+
+# Tutor agent - initially same as BobAgent
+class TutorAgent(BobAgent):
+    pass
+
+# Agent factory
+def get_agent(agent_selector: str):
+    if agent_selector == "default":
+        return DefaultAgent()
+    elif agent_selector == "Bob":
+        return BobAgent(llm_provider, chroma_vector_db)
+    elif agent_selector == "tutor":
+        return TutorAgent(llm_provider, chroma_vector_db)
+    else:
+        raise ValueError("Unknown agent selector")
+```
+
+6. Create a full documentation ser in the docs folder. The current index.md is created and maintained by MkDocs. Create a user manual based on the information you can retrieve. Then add
+the TEchnical User Guide, explaining the way the site is structured, configured, API etc. 
+
+Link to the docs directory from README and preset the documentation in a proper and readable way. 
+
+## Deliverables
+
+**Update the codebase so that agent selection and routing are handled as above. Do not break current functionality; "default" must behave exactly as it does now.**
+
+** Create the documentation site as specified
+
+
+
+
+
