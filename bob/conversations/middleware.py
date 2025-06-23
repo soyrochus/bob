@@ -11,6 +11,20 @@ from ..token_expander import expand_tokens
 from ..llm import stream_tokens
 from ..db import SessionLocal
 
+# Number of recent messages to include as conversation history
+HISTORY_LIMIT = 20
+
+
+async def get_history(db: AsyncSession, conv_id: int, limit: int = HISTORY_LIMIT) -> list[Message]:
+    """Return the last ``limit`` messages for the given conversation in chronological order."""
+    result = await db.execute(
+        select(Message)
+        .where(Message.conversation_id == conv_id)
+        .order_by(Message.created_at.desc())
+        .limit(limit)
+    )
+    return list(reversed(result.scalars().all()))
+
 
 async def get_conversations(db: AsyncSession, user: User) -> list[Conversation]:
     result = await db.execute(
@@ -69,12 +83,7 @@ async def stream_agent_response(db: AsyncSession, conv_id: int, user_msg_id: int
         yield "data: [DONE]\n\n"
         return
 
-    result = await db.execute(
-        select(Message)
-        .where(Message.conversation_id == conv.id)
-        .order_by(Message.created_at)
-    )
-    history = result.scalars().all()
+    history = await get_history(db, conv.id)
     messages: list[dict[str, str]] = [{"role": "system", "content": "You are Bob, an AI assistant."}]
     for msg in history:
         role = "assistant" if msg.sender == "bob" else "user"

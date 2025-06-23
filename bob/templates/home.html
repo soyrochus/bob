@@ -80,6 +80,11 @@
       </div>
      
       <form hx-post="/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:this.reset()" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
+        <!-- TODO: Mock agent selector -->
+        <select name="agent" class="px-3 py-2 rounded-md bg-[#f1f2f4] text-sm text-[#121416]">
+          <option>Bob</option>
+          <option>Tutor</option>
+        </select>
         <input type="text" name="text" placeholder="Message Bob..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
         <button type="submit" class="bg-[#dce8f3] text-[#121416] px-6 py-2 rounded-full font-semibold text-sm">Send</button>
       </form>
@@ -93,6 +98,17 @@
           }
         });
       </script>
+      <!-- Rename conversation modal -->
+      <!-- TODO: simple modal implementation -->
+      <div id="rename-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
+        <div class="bg-white p-4 rounded-xl w-80">
+          <input id="rename-input" type="text" class="w-full px-3 py-2 rounded border border-gray-300" />
+          <div class="flex justify-end gap-2 mt-4">
+            <button id="rename-cancel" class="px-3 py-1 rounded bg-gray-200">Cancel</button>
+            <button id="rename-ok" class="px-3 py-1 rounded bg-blue-500 text-white">OK</button>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
