@@ -37,17 +37,16 @@ class OpenAILLM(BaseLLM):
                 yield delta
 
 
-_provider: BaseLLM
-if settings.LLM_PROVIDER == "openai":
-    _provider = OpenAILLM(settings.OPENAI_API_KEY, settings.OPENAI_MODEL)
-else:
-    raise ValueError(f"Unsupported LLM provider: {settings.LLM_PROVIDER}")
 
 
-async def generate_text(messages: list[dict]) -> str:
-    return await _provider.generate_text(messages)
+async def generate_text(messages: list[dict], agent_name: str = "default") -> str:
+    """Generate text using the configured LLM for ``agent_name``."""
+    provider = settings.get_llm(agent_name)
+    return await provider.generate_text(messages)
 
 
-async def stream_tokens(messages: list[dict]) -> AsyncIterable[str]:
-    async for token in _provider.stream_tokens(messages):
+async def stream_tokens(messages: list[dict], agent_name: str = "default") -> AsyncIterable[str]:
+    """Stream tokens from the LLM for ``agent_name``."""
+    provider = settings.get_llm(agent_name)
+    async for token in provider.stream_tokens(messages):
         yield token
