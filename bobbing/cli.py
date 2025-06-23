@@ -103,11 +103,48 @@ def add(
     config: Optional[str] = typer.Option(None, "--config", "-c", help="Config file"),
 ) -> None:
     """Add documents to the vector database."""
+    import importlib
     cfg = load_config(config)
     if db_dir:
         cfg.db_dir = db_dir
     store = _init_store(cfg)
-    texts = [Path(p).read_text() for p in files]
+    texts = []
+    for p in files:
+        ext = p.suffix.lower()
+        text = None
+        try:
+            if ext == ".pdf":
+                PyPDF2 = importlib.import_module("PyPDF2")
+                with open(p, "rb") as f:
+                    reader = PyPDF2.PdfReader(f)
+                    text = "\n".join(page.extract_text() or "" for page in reader.pages)
+            elif ext == ".docx":
+                docx = importlib.import_module("docx")
+                doc = docx.Document(p)
+                text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
+            elif ext in (".xls", ".xlsx"):
+                openpyxl = importlib.import_module("openpyxl")
+                wb = openpyxl.load_workbook(p, data_only=True)
+                text = "\n".join(
+                    str(cell.value) for ws in wb.worksheets for row in ws.iter_rows() for cell in row if cell.value is not None
+                )
+            elif ext in (".pptx",):
+                pptx = importlib.import_module("pptx")
+                prs = pptx.Presentation(p)
+                slides = []
+                for slide in prs.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, "text"):
+                            slides.append(shape.text)
+                text = "\n".join(slides)
+            else:
+                # fallback to plain text
+                text = p.read_text(errors="ignore")
+        except Exception as e:
+            typer.echo(f"Failed to extract text from {p}: {e}", err=True)
+            continue
+        if text:
+            texts.append(text)
     store.add_texts(texts)
     store.persist()
     typer.echo(f"Added {len(texts)} documents to {cfg.db_dir}")

@@ -92,7 +92,7 @@ async def stream_agent_response(
         messages.append({"role": role, "content": msg.text})
 
     agent = get_agent(agent_name)
-
+    print(f"Using agent: {agent_name}")
     full_text = ""
     async for chunk in agent.stream(messages):
         full_text += chunk

@@ -49,6 +49,7 @@ class BobAgent(BaseAgent):
         if self._vector_db:
             docs = self._vector_db.similarity_search(prompt, k=3)
             context = "\n".join(d.page_content for d in docs)
+            print(f"Context retrieved: {context}")
         composed = messages.copy()
         if context:
             composed.append({"role": "system", "content": context})
