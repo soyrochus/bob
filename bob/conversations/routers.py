@@ -5,6 +5,7 @@ from sqlalchemy.future import select
 
 from ..models import Conversation, User
 from ..shared import templates, HOME_PANELS, get_db, get_current_user  # get_current_user is now a direct async function
+from ..settings import settings
 from .middleware import (
     get_conversations,
     get_conversation,
@@ -36,6 +37,8 @@ async def list_conversations(
     print("[DEBUG] active_conversation:", conv)
     messages = conv.messages if conv else []
     print("[DEBUG] messages:", messages)
+    agent_names = settings.get_agent_names()
+    active_agent = request.session.get("agent", agent_names[0] if agent_names else "default")
     return templates.TemplateResponse(
         "home.html",
         {
@@ -44,6 +47,8 @@ async def list_conversations(
             "active_conversation": conv,
             "messages": messages,
             "home_panels": HOME_PANELS,
+            "agent_names": agent_names,
+            "active_agent": active_agent,
         },
     )
 
@@ -60,6 +65,8 @@ async def read_conversation(
     conversations = await get_conversations(db, user)
     conv = await get_conversation(db, user, conv_id)
     messages = conv.messages if conv else []
+    agent_names = settings.get_agent_names()
+    active_agent = request.session.get("agent", agent_names[0] if agent_names else "default")
     return templates.TemplateResponse(
         "home.html",
         {
@@ -68,6 +75,8 @@ async def read_conversation(
             "active_conversation": conv,
             "messages": messages,
             "home_panels": HOME_PANELS,
+            "agent_names": agent_names,
+            "active_agent": active_agent,
         },
     )
 
@@ -83,6 +92,7 @@ async def send_message(
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         return RedirectResponse("/login")
+    request.session["agent"] = agent
     msg = await save_user_message(db, conv_id, text)
     if not msg:
         return ""
