@@ -6,13 +6,6 @@ from typing import AsyncIterable
 from . import llm
 from .settings import settings
 
-try:
-    from langchain.embeddings import OpenAIEmbeddings
-    from langchain.vectorstores import Chroma
-except Exception:  # pragma: no cover - optional dependency
-    OpenAIEmbeddings = None
-    Chroma = None
-
 
 class BaseAgent(ABC):
     """Shared interface for all agents."""
@@ -27,7 +20,7 @@ class DefaultAgent(BaseAgent):
     """Default agent using the raw LLM provider."""
 
     async def stream(self, messages: list[dict[str, str]]) -> AsyncIterable[str]:
-        async for token in llm.stream_tokens(messages):
+        async for token in llm.stream_tokens(messages, "default"):
             yield token
 
 
@@ -36,15 +29,7 @@ class BobAgent(BaseAgent):
 
     def __init__(self, agent_name: str) -> None:
         self._agent_name = agent_name
-        self._vector_db = self._init_vector_db()
-
-    def _init_vector_db(self):  # pragma: no cover - simple configuration helper
-        if not Chroma or not OpenAIEmbeddings:
-            return None
-        api_key = settings.get_agent_param(self._agent_name, "openai_api_key", settings.OPENAI_API_KEY)
-        path = settings.get_agent_param(self._agent_name, "vector_db_path", "chroma")
-        embeddings = OpenAIEmbeddings(openai_api_key=api_key)
-        return Chroma(persist_directory=path, embedding_function=embeddings)
+        self._vector_db = settings.get_vector_db(agent_name)
 
     async def stream(self, messages: list[dict[str, str]]) -> AsyncIterable[str]:
         prompt = messages[-1]["content"] if messages else ""
@@ -56,7 +41,7 @@ class BobAgent(BaseAgent):
         composed = messages.copy()
         if context:
             composed.append({"role": "system", "content": context})
-        async for token in llm.stream_tokens(composed):
+        async for token in llm.stream_tokens(composed, self._agent_name):
             yield token
 
 

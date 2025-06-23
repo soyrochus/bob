@@ -1,0 +1,26 @@
+[global]
+database_url="sqlite+aiosqlite:///./db/bob.db"
+host="0.0.0.0"
+port=8000
+redis_url="redis://localhost:6379/0"
+
+[agents.default]
+llm = "openai"
+openai_api_key = "XXXX"
+openai_model = "gpt-4.1"
+
+[agents.bob]
+llm = "openai"
+openai_api_key = "XXXX"
+openai_model = "gpt-4.1"
+vector_db_type = "Chroma"
+vector_db_embedding = "openai"
+vector_db_path = "./db/chroma"
+
+[agents.tutor]
+llm = "openai"
+openai_api_key = "XXXX"
+openai_model = "gpt-4.1"
+vector_db_type = "Chroma"
+vector_db_embedding = "openai"
+vector_db_path = "./db/chroma"
