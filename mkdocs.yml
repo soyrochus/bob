@@ -3,3 +3,6 @@ theme:
   name: material
 nav:
   - Home: index.md
+  - User Manual: user_manual.md
+  - Technical Guide: technical_guide.md
+  - CLI Guide: bobbing_cli.md

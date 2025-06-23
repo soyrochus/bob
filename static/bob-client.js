@@ -1,4 +1,4 @@
-function startStream(convId, msgId) {
+function startStream(convId, msgId, agent) {
   const container = document.getElementById('messages');
   const wrapper = document.createElement('div');
   wrapper.className = 'flex items-start gap-3';
@@ -18,7 +18,7 @@ function startStream(convId, msgId) {
 </div>`;
   container.appendChild(wrapper);
   const textSpan = wrapper.querySelector('.bob-text');
-  const source = new EventSource(`/${convId}/stream?user_msg_id=${msgId}`);
+  const source = new EventSource(`/${convId}/stream?user_msg_id=${msgId}&agent=${agent}`);
   let fullText = '';
   source.onmessage = (event) => {
     if (event.data === '[DONE]') {
