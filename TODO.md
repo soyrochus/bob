@@ -1,8 +1,8 @@
 # TODO
 
 - [X] Add memory functionality to conversations to persist and recall previous messages.
-- [-+] Implement RAG
-- [ ] implement Conversation config (RAG, Agents, Web Search etc)
+- [X] Implement RAG
+- [X] implement Conversation config (configurable agents)
 - [-+] Add Converation deletion, renaming etc
 - [ ] Check the rendering of the conversations component for correctness and UI consistency.
 - [ ] Review the render component item
