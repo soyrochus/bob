@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from ..models import Conversation, Message, User
 from ..token_expander import expand_tokens
-from ..llm import stream_tokens
+from ..agents import get_agent
 from ..db import SessionLocal
 
 # Number of recent messages to include as conversation history
@@ -74,7 +74,9 @@ async def save_user_message(db: AsyncSession, conv_id: int, text: str) -> Messag
     return user_msg
 
 
-async def stream_agent_response(db: AsyncSession, conv_id: int, user_msg_id: int) -> AsyncGenerator[str, None]:
+async def stream_agent_response(
+    db: AsyncSession, conv_id: int, user_msg_id: int, agent_name: str
+) -> AsyncGenerator[str, None]:
     result = await db.execute(select(Conversation).where(Conversation.id == conv_id))
     conv = result.scalars().first()
     result = await db.execute(select(Message).where(Message.id == user_msg_id))
@@ -89,8 +91,10 @@ async def stream_agent_response(db: AsyncSession, conv_id: int, user_msg_id: int
         role = "assistant" if msg.sender == "bob" else "user"
         messages.append({"role": role, "content": msg.text})
 
+    agent = get_agent(agent_name)
+
     full_text = ""
-    async for chunk in stream_tokens(messages):
+    async for chunk in agent.stream(messages):
         full_text += chunk
         yield f"data: {chunk}\n\n"
 

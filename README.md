@@ -62,8 +62,14 @@ Bob is a single-user proof of concept written in Python and FastAPI.
    or
 
    ```bash
-   python -m bob
-   ```
+  python -m bob
+  ```
+
+## Bobbing CLI
+
+Administrative tasks such as managing the vector database can be performed with
+the `bobbing` command-line tool. See the [CLI guide](docs/bobbing_cli.md) for
+installation and usage details.
 
 ## Configuration
 
@@ -84,5 +90,9 @@ Bob is a single-user proof of concept written in Python and FastAPI.
 Copyright © 2025, Iwan van der Kleijn
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Documentation
+
+Full user and technical documentation is available in the [docs](docs/index.md) directory. The site can be built using [MkDocs](https://www.mkdocs.org/).
 
 

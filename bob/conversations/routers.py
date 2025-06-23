@@ -76,6 +76,7 @@ async def read_conversation(
 async def send_message(
     request: Request,
     conv_id: int,
+    agent: str = Form("default"),
     text: str = Form(...),
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
@@ -87,7 +88,7 @@ async def send_message(
         return ""
     return templates.TemplateResponse(
         "partials/user_message_and_stream.html",
-        {"request": {}, "msg": msg, "conv_id": conv_id},
+        {"request": {}, "msg": msg, "conv_id": conv_id, "agent": agent},
     )
 
 
@@ -96,6 +97,7 @@ async def stream_response(
     request: Request,
     conv_id: int,
     user_msg_id: int,
+    agent: str = "default",
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
     user = await get_current_user(request, db)  # Pass db to get_current_user
@@ -104,7 +106,7 @@ async def stream_response(
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(empty(), media_type="text/event-stream")
-    generator = stream_agent_response(db, conv_id, user_msg_id)
+    generator = stream_agent_response(db, conv_id, user_msg_id, agent)
     return StreamingResponse(generator, media_type="text/event-stream")
 
 
