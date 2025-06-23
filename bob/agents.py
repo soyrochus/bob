@@ -34,14 +34,17 @@ class DefaultAgent(BaseAgent):
 class BobAgent(BaseAgent):
     """RAG-enabled agent using a local Chroma vector database."""
 
-    def __init__(self) -> None:
+    def __init__(self, agent_name: str) -> None:
+        self._agent_name = agent_name
         self._vector_db = self._init_vector_db()
 
     def _init_vector_db(self):  # pragma: no cover - simple configuration helper
         if not Chroma or not OpenAIEmbeddings:
             return None
-        embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
-        return Chroma(persist_directory="chroma", embedding_function=embeddings)
+        api_key = settings.get_agent_param(self._agent_name, "openai_api_key", settings.OPENAI_API_KEY)
+        path = settings.get_agent_param(self._agent_name, "vector_db_path", "chroma")
+        embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+        return Chroma(persist_directory=path, embedding_function=embeddings)
 
     async def stream(self, messages: list[dict[str, str]]) -> AsyncIterable[str]:
         prompt = messages[-1]["content"] if messages else ""
@@ -60,13 +63,16 @@ class BobAgent(BaseAgent):
 class TutorAgent(BobAgent):
     """Alias for BobAgent to be extended later."""
 
+    def __init__(self, agent_name: str) -> None:
+        super().__init__(agent_name)
+
 
 def get_agent(name: str) -> BaseAgent:
     """Factory returning an agent instance based on ``name``."""
     if name == "default":
         return DefaultAgent()
     if name == "Bob":
-        return BobAgent()
+        return BobAgent("bob")
     if name == "tutor":
-        return TutorAgent()
+        return TutorAgent("tutor")
     raise ValueError(f"Unknown agent selector: {name}")
