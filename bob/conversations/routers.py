@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
-from ..models import User
+from ..models import Conversation, User
 from ..shared import templates, HOME_PANELS, get_db, get_current_user  # get_current_user is now a direct async function
 from .middleware import (
     get_conversations,
@@ -139,4 +140,29 @@ async def search(
             "conversations": conversations,
             "active_conversation": None,
         },
+    )
+
+
+@router.post("/{conv_id}/rename", response_class=HTMLResponse)
+async def rename_conversation(
+    conv_id: int,
+    request: Request,
+    title: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+):
+    user = await get_current_user(request, db)
+    if not user:
+        return HTMLResponse(status_code=403, content="Not authorized")
+    result = await db.execute(
+        select(Conversation).where(Conversation.id == conv_id, Conversation.user_id == user.id)
+    )
+    conv = result.scalars().first()
+    if not conv:
+        return HTMLResponse(status_code=404, content="")
+    conv.title = title
+    await db.commit()
+    await db.refresh(conv)
+    return templates.TemplateResponse(
+        "partials/conversation_item.html",
+        {"request": request, "conv": conv, "active_conversation": None},
     )

@@ -35,3 +35,31 @@ document.addEventListener('DOMContentLoaded', function() {
     el.innerHTML = marked.parse(el.textContent);
   });
 });
+
+function openRenameModal(convId, currentTitle) {
+  const modal = document.getElementById('rename-modal');
+  const input = document.getElementById('rename-input');
+  const ok = document.getElementById('rename-ok');
+  const cancel = document.getElementById('rename-cancel');
+  input.value = currentTitle;
+  modal.classList.remove('hidden');
+
+  cancel.onclick = () => {
+    modal.classList.add('hidden');
+  };
+
+  ok.onclick = async () => {
+    const title = input.value;
+    const resp = await fetch(`/${convId}/rename`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `title=${encodeURIComponent(title)}`
+    });
+    if (resp.ok) {
+      const html = await resp.text();
+      const element = document.getElementById(`conv-${convId}`);
+      if (element) element.outerHTML = html;
+    }
+    modal.classList.add('hidden');
+  };
+}
