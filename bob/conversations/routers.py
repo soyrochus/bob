@@ -14,6 +14,7 @@ from .middleware import (
     save_user_message,
     stream_agent_response,
     search_conversations,
+    delete_conversation,
 )
 
 router = APIRouter()
@@ -179,3 +180,19 @@ async def rename_conversation(
         "partials/conversation_item.html",
         {"request": request, "conv": conv, "active_conversation": None},
     )
+
+
+@router.post("/{conv_id}/delete", response_class=HTMLResponse)
+async def delete_conversation_route(
+    conv_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    user = await get_current_user(request, db)
+    if not user:
+        return HTMLResponse(status_code=403, content="Not authorized")
+    success = await delete_conversation(db, user, conv_id)
+    if not success:
+        return HTMLResponse(status_code=404, content="")
+    # Redirect the user back to the conversation list after deletion
+    return RedirectResponse("/", status_code=303)

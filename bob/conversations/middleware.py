@@ -113,3 +113,16 @@ async def search_conversations(db: AsyncSession, user: User, query: str) -> list
         .order_by(Conversation.created_at.desc())
     )
     return result.scalars().all()
+
+
+async def delete_conversation(db: AsyncSession, user: User, conv_id: int) -> bool:
+    """Delete a conversation owned by the given user."""
+    result = await db.execute(
+        select(Conversation).where(Conversation.id == conv_id, Conversation.user_id == user.id)
+    )
+    conv = result.scalars().first()
+    if not conv:
+        return False
+    await db.delete(conv)
+    await db.commit()
+    return True
