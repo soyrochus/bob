@@ -1,4 +1,6 @@
-# Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
+"""Task queue backed by Redis."""
+
+# Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | License: MIT
 from __future__ import annotations
 
 import json

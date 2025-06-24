@@ -1,5 +1,7 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
+"""FastAPI application wiring and route registration."""
+
 import json
 from contextlib import asynccontextmanager
 from pathlib import Path

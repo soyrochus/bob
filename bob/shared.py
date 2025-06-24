@@ -1,3 +1,5 @@
+"""Shared helpers for template rendering and database access."""
+
 import json
 from pathlib import Path
 from fastapi.templating import Jinja2Templates
@@ -17,6 +19,7 @@ HOME_PANELS = json.loads((Path(__file__).resolve().parent.parent / "home-panels.
 
 # Async DB session generator (as a plain async generator function)
 async def get_db(): # This is now an async generator function
+    """Yield an ``AsyncSession`` and ensure it is closed."""
     session = SessionLocal()
     print(f"[DEBUG] get_db: Created session {type(session)}")
     try:
@@ -28,6 +31,7 @@ async def get_db(): # This is now an async generator function
 
 # Async current user fetcher
 async def get_current_user(request: Request, db: AsyncSession): # Removed Depends(get_db)
+    """Return the logged in :class:`User` or ``None``."""
     user_id = request.session.get("user_id")
     if user_id:
         result = await db.execute(select(User).where(User.id == user_id))
