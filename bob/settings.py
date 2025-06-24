@@ -46,6 +46,10 @@ class Settings:
         self._global: Dict = data.get("global", {})
         self._agents: Dict[str, Dict] = data.get("agents", {})
 
+        # Load environment variables if available
+        from dotenv import load_dotenv
+        load_dotenv()
+
         # Global settings
         self.DATABASE_URL = self._global.get("database_url", "sqlite+aiosqlite:///./db/bob.db")
         self.HOST = self._global.get("host", "0.0.0.0")
@@ -81,7 +85,21 @@ class Settings:
         return self._agents.get(name, {})
 
     def get_agent_param(self, name: str, param: str, default=None):
-        return self.get_agent(name).get(param, default)
+        agent_cfg = self.get_agent(name)
+        value = agent_cfg.get(param, default)
+        if isinstance(value, str) and value.startswith("@"):  # variable indirection
+            varname = value[1:]
+            # 1. Check [global] section
+            global_cfg = self._provider.load(self._path).get("global", {}) if self._path else {}
+            if varname in global_cfg:
+                return global_cfg[varname]
+            # 2. Check OS environment
+            env_value = os.getenv(varname)
+            if env_value is not None:
+                return env_value
+            # 3. Fallback to default
+            return default
+        return value
 
     def get_openai_api_key(self, name: str) -> Optional[str]:
         """Return OpenAI API key for ``name`` with environment fallback."""
