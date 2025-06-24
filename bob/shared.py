@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
+from .settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 from .db import SessionLocal
 from .models import User
@@ -9,6 +10,7 @@ from sqlalchemy.future import select
 
 # Jinja2 templates
 templates = Jinja2Templates(directory="bob/templates")
+templates.env.globals["settings"] = settings
 
 # Home panels data
 HOME_PANELS = json.loads((Path(__file__).resolve().parent.parent / "home-panels.json").read_text())

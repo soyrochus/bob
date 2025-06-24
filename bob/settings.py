@@ -55,6 +55,10 @@ class Settings:
         self.HOST = self._global.get("host", "0.0.0.0")
         self.PORT = int(self._global.get("port", 8000))
         self.REDIS_URL = self._global.get("redis_url", "redis://localhost:6379/0")
+        self.SITE_TITLE = self._global.get("site_title", "Bob Portal")
+        self.SITE_HEADER = self._global.get("site_header", "Phoenix")
+        self.SITE_TAGLINE = self._global.get("site_tagline", "AI-Powered Learning")
+        self.PERSONA_NAME = self._global.get("persona_name", "Bob")
 
         # Environment fallbacks for agent-specific keys
         self._env_openai_api_key = os.getenv("OPENAI_API_KEY")
