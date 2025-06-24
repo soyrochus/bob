@@ -1,107 +1,82 @@
-##  Implement a Generic, Extensible Settings Protocol with TOML Support for Agent Configurations 
+Implement the following dynamic agent instantiation and selection mechanism using the provided configuration pattern:
 
-**Objective:**
+### 1. **Agent Configuration Parsing**
 
-Implement the following: 
+* Agent definitions reside under `[agents.ID]` sections in `config.toml`.
 
-Refactor the project’s configuration system to use a generic `Settings` protocol, allowing multiple implementations (starting with TOML) for hierarchical agent-specific settings. The goal is to make the config system robust, clear, and easily extensible to other formats (YAML, JSON, etc.) in the future, while supporting clean, per-agent configuration.
+  * The `ID` (after `agents.`) is the unique agent identifier.
+* Within each agent config:
 
-Obtaining the agent names in the home.html select tag (name=agent) from the Setting. So the agents are configurable
----
+  * If `agent_type` is set, it denotes the class/type to instantiate.
+  * If `agent_type` is **not** set, **use the agent's ID as the type**.
+    ***This behavior must be documented clearly in code.***
+  * If `home_selector` is present, its value will be used as the label in the frontend agent selector.
 
-### **Requirements**
+### 2. **Dynamic Agent Instantiation and Caching**
 
-1. **Settings Protocol:**
+* On startup (or config reload), **parse all `[agents.*]` sections**.
+* For each agent:
 
-   * Define a `SettingsProvider` protocol or abstract base with a single method: `load(path: str) -> dict`.
-   * Implement a `TomlSettingsProvider` that loads configuration from a TOML file, supporting nested sections.
+  * Instantiate the correct agent class, determined by `agent_type` or, if absent, by ID.
+  * Cache the instantiated agents in a **global registry** keyed by agent ID.
+  * Ensure that each agent is instantiated only once and reused throughout the application.
+* Remove hardcoded instantiation logic (e.g., no `if id == "bob": ...` in `get_agent`).
+  The code should be fully data-driven based on config.
 
-2. **Settings Class:**
+### 3. **Frontend Selector Logic**
 
-   * Implement a `Settings` class that:
+* **Agents shown in the frontend selector** are those with a `home_selector` value set.
 
-     * Loads configuration using a pluggable `SettingsProvider`.
-     * By default, discovers the config file in environment variable: "bob_config_path" and if not set from the current dir (tries in order: `bob-config.toml`, `bobconfig.toml or `bob.toml`)
-     * Supports easy access to a list of agent names and their respective parameters.
-     * For each agent, exposes relevant settings, such as:
+  * For each agent with `home_selector`, present a tuple:
 
-       * `llm` (for the LLM provider, required for all agents)
-       * `vector_db_path` (optional, required for Bob and Tutor)
-    for more: see the examlples
-     * Cleanly handles missing agents or missing parameters with appropriate errors/defaults.
+    * `(ID, home_selector)`
+      *Example: `("bob", "Maverick")`.*
+* The **ID** is used internally and for backend API calls.
+  The **home\_selector** value is shown as the visible label in the UI.
+* Agents without `home_selector` are instantiated and available internally but **not shown in the frontend selector**.
 
-3. **TOML Example:**
+### 4. **Behavioral Requirements**
 
-   * Write a `bobbingconfig.toml` defining three agents:
+* If `home_selector` is omitted, the agent should not be included in the frontend selector, but should still be instantiated and available via API if needed.
+* All agent lookups and operations must go through the global registry, using the ID.
+* If agent configuration is changed at runtime, update the registry and refresh the frontend selector as needed.
 
-     * **default:** LLM provider only.
-     * **bob:** LLM provider and path to vector database.
-     * **tutor:** LLM provider and path to vector database.
+### 5. **Documentation and Example**
 
----
+* **Document in code**:
 
-### **Example TOML Config (`bobbingconfig.toml`):**
+  * How agent instantiation resolves class/type via `agent_type` or ID fallback.
+  * The purpose and usage of `home_selector`.
+* **Example TOML snippet:**
 
-```toml
-[agents.default]
-llm = "openai"
-openai_api_key="XXXXX"
+  ```toml
+  [agents.default]
+  agent_type = "default"
+  llm = "openai"
+  openai_api_key = "@openai_api_key"
 
-[agents.bob]
-llm = "openai"
-openai_api_key="XXXXX"
-vector_db_type="Chroma"
-vector_db_embedding="openai"
-vector_db_embedding="openai"
-vector_db_path = "./db/chroma"
+  [agents.bob]
+  agent_type = "bob"
+  home_selector = "Maverick"
+  llm = "openai"
+  # ...
 
-[agents.tutor]
-llm = "openai"
-openai_api_key="XXXXX"
-vector_db_type="Chroma"
-vector_db_embedding="openai"
-vector_db_path = "./db/chroma"```
+  [agents.tutor]
+  # agent_type omitted; class 'tutor' will be used
+  # no home_selector; will not appear in frontend selector
 
----
-
-### **Class Requirements:**
-
-* **SettingsProvider Protocol:**
-
-  * Has `load(path: str) -> dict`.
-
-* **TomlSettingsProvider:**
-
-  * Implements the above for TOML files.
-
-* **Settings class:**
-
-  * On construction, accepts a `SettingsProvider` and optional path.
-  * Finds and loads the config file, storing the agent settings.
-  * Provides:
-
-    * `get_agent_names() -> List[str]`
-    * `get_agent(name: str) -> dict`
-    * `get_agent_param(name: str, param: str, default=None)`
-  * Handles errors or missing configs gracefully.
-
-* **Leave room for future YAML/JSON providers.**
+  [agents.coach]
+  agent_type = "tutor"
+  home_selector = "Coach"
+  # ...
+  ```
 
 ---
 
-### **Deliverables:**
+### **Summary of Steps**
 
-* Python module with:
+* Parse `[agents.*]` in config.
+* For each, determine `agent_type` (or ID), instantiate, cache in registry.
+* Build frontend selector list as `[(ID, home_selector)]` for agents where `home_selector` exists.
+* Ensure code and config are thoroughly documented.
 
-  * `SettingsProvider` protocol
-  * `TomlSettingsProvider` implementation
-  * `Settings` class with above requirements
-* The example TOML config as above
-* Minimal example usage in `__main__` or docstring
-
-
-
-**Emphasize clarity and extensibility; avoid breaking changes to other parts of the codebase.**
-
-# Obtaining the agent names in the home.html select tag (name=agent) from the Setting. 
-Get from the new SettingsProvider implementation the agents names (with get_agent_names) and use this to show the list. Make the choice of the agent selection "sticky" (so once switched, the agent should be sticky on the session level)
