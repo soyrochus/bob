@@ -5,11 +5,15 @@ port=8000
 redis_url="redis://localhost:6379/0"
 
 [agents.default]
+agent_type = "default"
+home_selector = "LLM"
 llm = "openai"
 openai_api_key = "XXXX"
 openai_model = "gpt-4.1"
 
 [agents.bob]
+agent_type = "bob"
+home_selector = "Maverick"
 llm = "openai"
 openai_api_key = "XXXX"
 openai_model = "gpt-4.1"

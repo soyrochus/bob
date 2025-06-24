@@ -1,7 +1,15 @@
 from __future__ import annotations
 
+"""Agent implementations and dynamic registry.
+
+Agents are configured in ``bob-config.toml`` under ``[agents.ID]`` sections.
+Each section may specify ``agent_type`` to override the class name.  If the
+field is omitted, the section ID itself is used as the type name.  When present,
+``home_selector`` provides the label for the frontend agent picker.
+"""
+
 from abc import ABC, abstractmethod
-from typing import AsyncIterable
+from typing import AsyncIterable, Dict, List, Tuple, Type
 
 from . import llm
 from .settings import settings
@@ -52,14 +60,83 @@ class TutorAgent(BobAgent):
         super().__init__(agent_name)
 
 
-def get_agent(name: str) -> BaseAgent:
+# ---------------------------------------------------------------------------
+# Dynamic agent registry
+# ---------------------------------------------------------------------------
 
-    name = name.lower()
-    """Factory returning an agent instance based on ``name``."""
-    if name == "default":
-        return DefaultAgent()
-    if name == "bob":
-        return BobAgent("bob")
-    if name == "tutor":
-        return TutorAgent("tutor")
-    raise ValueError(f"Unknown agent selector: {name}")
+#: Registered agent classes keyed by ``agent_type`` name
+_AGENT_TYPES: Dict[str, Type[BaseAgent]] = {}
+
+#: Cached agent instances keyed by agent ID from the configuration
+_AGENT_INSTANCES: Dict[str, BaseAgent] = {}
+
+#: Selector options as ``(ID, label)`` tuples for the frontend
+_SELECTOR_CHOICES: List[Tuple[str, str]] = []
+
+
+def register_agent_type(name: str, cls: Type[BaseAgent]) -> None:
+    """Register an agent class for dynamic instantiation."""
+
+    _AGENT_TYPES[name.lower()] = cls
+
+
+def _instantiate_agent(agent_id: str) -> BaseAgent:
+    """Instantiate the agent configured under ``agents.agent_id``.
+
+    ``agent_type`` may be specified in the config to override the class
+    name.  If omitted, the agent ID itself is used as the type name.
+    """
+
+    agent_type = settings.get_agent_param(agent_id, "agent_type", agent_id)
+    agent_type = str(agent_type).lower()
+    cls = _AGENT_TYPES.get(agent_type)
+    if not cls:
+        raise ValueError(f"Unknown agent_type '{agent_type}' for agent '{agent_id}'")
+
+    try:
+        return cls(agent_id)  # most agents expect the id
+    except TypeError:
+        # fall back to parameterless constructor
+        return cls()
+
+
+def load_agents() -> None:
+    """Parse ``[agents.*]`` sections and instantiate all agents."""
+
+    _AGENT_INSTANCES.clear()  # ensure single instantiation per reload
+    _SELECTOR_CHOICES.clear()
+
+    for agent_id in settings.get_agent_names():
+        instance = _instantiate_agent(agent_id)
+        _AGENT_INSTANCES[agent_id] = instance
+        label = settings.get_agent_param(agent_id, "home_selector")
+        if label is not None:
+            _SELECTOR_CHOICES.append((agent_id, str(label)))
+
+
+def get_agent(name: str) -> BaseAgent:
+    """Return a cached agent instance by ``name``."""
+
+    if not _AGENT_INSTANCES:
+        load_agents()
+
+    try:
+        return _AGENT_INSTANCES[name.lower()]
+    except KeyError:  # pragma: no cover - invalid name branch
+        raise ValueError(f"Unknown agent selector: {name}")
+
+
+def get_selector_choices() -> List[Tuple[str, str]]:
+    """Return ``(ID, label)`` tuples for agents in the frontend selector."""
+
+    if not _AGENT_INSTANCES:
+        load_agents()
+    return list(_SELECTOR_CHOICES)
+
+
+# Register built-in agent types and eagerly load configured agents
+register_agent_type("default", DefaultAgent)
+register_agent_type("bob", BobAgent)
+register_agent_type("tutor", TutorAgent)
+
+load_agents()

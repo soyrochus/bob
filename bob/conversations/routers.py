@@ -6,6 +6,7 @@ from sqlalchemy.future import select
 from ..models import Conversation, User
 from ..shared import templates, HOME_PANELS, get_db, get_current_user  # get_current_user is now a direct async function
 from ..settings import settings
+from ..agents import get_selector_choices
 from .middleware import (
     get_conversations,
     get_conversation,
@@ -37,8 +38,8 @@ async def list_conversations(
     print("[DEBUG] active_conversation:", conv)
     messages = conv.messages if conv else []
     print("[DEBUG] messages:", messages)
-    agent_names = settings.get_agent_names()
-    active_agent = request.session.get("agent", agent_names[0] if agent_names else "default")
+    agent_names = get_selector_choices()
+    active_agent = request.session.get("agent", agent_names[0][0] if agent_names else "default")
     return templates.TemplateResponse(
         "home.html",
         {
@@ -65,8 +66,8 @@ async def read_conversation(
     conversations = await get_conversations(db, user)
     conv = await get_conversation(db, user, conv_id)
     messages = conv.messages if conv else []
-    agent_names = settings.get_agent_names()
-    active_agent = request.session.get("agent", agent_names[0] if agent_names else "default")
+    agent_names = get_selector_choices()
+    active_agent = request.session.get("agent", agent_names[0][0] if agent_names else "default")
     return templates.TemplateResponse(
         "home.html",
         {

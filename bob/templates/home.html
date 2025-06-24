@@ -82,7 +82,7 @@
       <form hx-post="/{{ active_conversation.id }}/message" hx-target="#messages" hx-swap="beforeend" hx-on="htmx:afterRequest:document.querySelector('[name=text]').value=''" class="fixed bottom-0 left-64 right-0 bg-[#f7f8fa] px-12 py-4 flex gap-2 z-10">
         <select name="agent" class="px-3 py-2 rounded-md bg-[#f1f2f4] text-sm text-[#121416]">
           {% for agent in agent_names %}
-          <option value="{{ agent }}" {% if agent == active_agent %}selected{% endif %}>{{ agent }}</option>
+          <option value="{{ agent[0] }}" {% if agent[0] == active_agent %}selected{% endif %}>{{ agent[1] }}</option>
           {% endfor %}
         </select>
         <input type="text" name="text" placeholder="Message Bob..." class="flex-1 px-4 py-3 rounded-xl bg-[#f1f2f4] border-none focus:ring-0 text-[#121416] text-base" />
