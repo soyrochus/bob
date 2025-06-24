@@ -1,3 +1,5 @@
+"""Helper utilities for renderable server-side components."""
+
 import logging
 from typing import Callable, Dict
 

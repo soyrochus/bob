@@ -1,3 +1,5 @@
+"""Async helpers for conversation management."""
+
 from __future__ import annotations
 
 from typing import AsyncGenerator, Iterable
@@ -28,6 +30,7 @@ async def get_history(db: AsyncSession, conv_id: int, limit: int = HISTORY_LIMIT
 
 
 async def get_conversations(db: AsyncSession, user: User) -> list[Conversation]:
+    """Return a list of conversations for ``user`` with messages expanded."""
     result = await db.execute(
         select(Conversation)
         .options(selectinload(Conversation.messages))
@@ -42,6 +45,7 @@ async def get_conversations(db: AsyncSession, user: User) -> list[Conversation]:
 
 
 async def get_conversation(db: AsyncSession, user: User, conv_id: int) -> Conversation | None:
+    """Return ``conv_id`` if owned by ``user`` with messages expanded."""
     result = await db.execute(
         select(Conversation)
         .options(selectinload(Conversation.messages))
@@ -55,6 +59,7 @@ async def get_conversation(db: AsyncSession, user: User, conv_id: int) -> Conver
 
 
 async def create_conversation(db: AsyncSession, user: User) -> Conversation:
+    """Create a new empty conversation for ``user``."""
     conv = Conversation(title="New Conversation", user_id=user.id)
     db.add(conv)
     await db.commit()
@@ -63,6 +68,7 @@ async def create_conversation(db: AsyncSession, user: User) -> Conversation:
 
 
 async def save_user_message(db: AsyncSession, conv_id: int, text: str) -> Message | None:
+    """Persist a user message in ``conv_id`` and return the DB instance."""
     result = await db.execute(select(Conversation).where(Conversation.id == conv_id))
     conv = result.scalars().first()
     if not conv:
@@ -78,6 +84,7 @@ async def save_user_message(db: AsyncSession, conv_id: int, text: str) -> Messag
 async def stream_agent_response(
     db: AsyncSession, conv_id: int, user_msg_id: int, agent_name: str
 ) -> AsyncGenerator[str, None]:
+    """Stream the agent response for ``user_msg_id`` and store it."""
     result = await db.execute(select(Conversation).where(Conversation.id == conv_id))
     conv = result.scalars().first()
     result = await db.execute(select(Message).where(Message.id == user_msg_id))
@@ -109,6 +116,7 @@ async def stream_agent_response(
 
 
 async def search_conversations(db: AsyncSession, user: User, query: str) -> list[Conversation]:
+    """Return conversations for ``user`` whose title matches ``query``."""
     result = await db.execute(
         select(Conversation)
         .where(Conversation.user_id == user.id, Conversation.title.ilike(f"%{query}%"))

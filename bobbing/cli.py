@@ -1,3 +1,5 @@
+"""Administrative command line interface for Bob."""
+
 from __future__ import annotations
 
 import os

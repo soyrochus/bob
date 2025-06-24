@@ -1,5 +1,7 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
+"""Interfaces to language model providers."""
+
 from abc import ABC, abstractmethod
 from typing import AsyncIterable
 
@@ -40,13 +42,13 @@ class OpenAILLM(BaseLLM):
 
 
 async def generate_text(messages: list[dict], agent_name: str = "default") -> str:
-    """Generate text using the configured LLM for ``agent_name``."""
+    """Return the full response text from the configured LLM."""
     provider = settings.get_llm(agent_name)
     return await provider.generate_text(messages)
 
 
 async def stream_tokens(messages: list[dict], agent_name: str = "default") -> AsyncIterable[str]:
-    """Stream tokens from the LLM for ``agent_name``."""
+    """Yield response tokens from the configured LLM."""
     provider = settings.get_llm(agent_name)
     async for token in provider.stream_tokens(messages):
         yield token

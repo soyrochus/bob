@@ -1,5 +1,7 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
+"""Pydantic schemas for API responses."""
+
 from datetime import datetime
 from pydantic import BaseModel
 

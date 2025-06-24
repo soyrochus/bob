@@ -1,3 +1,5 @@
+"""Simple task queue using a SQLite table."""
+
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
 from __future__ import annotations

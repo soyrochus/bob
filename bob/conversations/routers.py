@@ -1,3 +1,5 @@
+"""HTTP routes for conversation management and chat interface."""
+
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +27,7 @@ async def list_conversations(
     request: Request,
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Render the home page showing the latest conversation list."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     print("[DEBUG] / called")
     print("[DEBUG] request:", request)
@@ -61,6 +64,7 @@ async def read_conversation(
     request: Request,
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Display a single conversation and its messages."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         return RedirectResponse("/login")
@@ -91,6 +95,7 @@ async def send_message(
     text: str = Form(...),
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Persist a message and return markup for streaming the reply."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         return RedirectResponse("/login")
@@ -112,6 +117,7 @@ async def stream_response(
     agent: str = "default",
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Server-sent events endpoint for agent streaming."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         async def empty():
@@ -127,6 +133,7 @@ async def new_conversation(
     request: Request,
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Create a new conversation and return the rendered list item."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         return RedirectResponse("/login")
@@ -143,6 +150,7 @@ async def search(
     request: Request,
     db: AsyncSession = Depends(get_db),  # Inject db session here
 ):
+    """Return conversations matching ``q`` rendered as a partial list."""
     user = await get_current_user(request, db)  # Pass db to get_current_user
     if not user:
         return RedirectResponse("/login")
@@ -164,6 +172,7 @@ async def rename_conversation(
     title: str = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
+    """Rename a conversation and return the updated list item."""
     user = await get_current_user(request, db)
     if not user:
         return HTMLResponse(status_code=403, content="Not authorized")
@@ -188,6 +197,7 @@ async def delete_conversation_route(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """Delete ``conv_id`` and redirect to the conversation list."""
     user = await get_current_user(request, db)
     if not user:
         return HTMLResponse(status_code=403, content="Not authorized")

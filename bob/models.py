@@ -1,5 +1,7 @@
 # Part of Bob: an AI-driven learning and productivity portal for individuals and organizations | Copyright (c) 2025 | License: MIT
 
+"""SQLAlchemy ORM models used by the application."""
+
 from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
