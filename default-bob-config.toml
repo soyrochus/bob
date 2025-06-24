@@ -3,6 +3,10 @@ database_url="sqlite+aiosqlite:///./db/bob.db"
 host="0.0.0.0"
 port=8000
 redis_url="redis://localhost:6379/0"
+site_title="Bob Portal"
+site_header="Phoenix"
+site_tagline="AI-Powered Learning"
+persona_name="Bob"
 
 [agents.default]
 agent_type = "default"

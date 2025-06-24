@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from ..models import Conversation, Message, User
 from ..token_expander import expand_tokens
 from ..agents import get_agent
+from ..settings import settings
 from ..db import SessionLocal
 
 # Number of recent messages to include as conversation history
@@ -86,7 +87,8 @@ async def stream_agent_response(
         return
 
     history = await get_history(db, conv.id)
-    messages: list[dict[str, str]] = [{"role": "system", "content": "You are Bob, an AI assistant."}]
+    persona = settings.PERSONA_NAME
+    messages: list[dict[str, str]] = [{"role": "system", "content": f"You are {persona}, an AI assistant."}]
     for msg in history:
         role = "assistant" if msg.sender == "bob" else "user"
         messages.append({"role": role, "content": msg.text})
