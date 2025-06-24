@@ -1,0 +1,2 @@
+openai_api_key="XXXX"
+db_dir="./db/chroma"
