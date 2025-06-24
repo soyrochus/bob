@@ -1,9 +1,13 @@
-<div id="conv-{{ conv.id }}" class="flex items-center gap-2">
+<div id="conv-{{ conv.id }}" class="relative group flex items-center gap-2">
   <a href="/{{ conv.id }}" class="flex flex-1 items-center gap-3 px-3 py-2 rounded-lg {% if active_conversation and active_conversation.id == conv.id %}bg-[#f1f2f4]{% else %}hover:bg-[#f1f2f4]{% endif %} cursor-pointer">
     <div>
       <p class="text-[#121416] text-sm font-medium">{{ conv.title }}</p>
       <p class="text-[#6a7681] text-xs">{{ conv.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
     </div>
   </a>
-  <button type="button" class="text-xs text-[#6a7681]" onclick='openRenameModal({{ conv.id }}, {{ conv.title| tojson }})'>Rename</button>
+  <button type="button" class="hidden group-hover:block px-2 text-lg text-[#6a7681]" aria-label="Conversation menu" onclick="toggleMenu({{ conv.id }})">&#8230;</button>
+  <div id="menu-{{ conv.id }}" class="hidden absolute right-0 mt-1 w-28 bg-white border border-[#e7eaf0] rounded-lg shadow-md z-10">
+    <button type="button" class="block w-full text-left px-4 py-2 text-sm hover:bg-[#f1f2f4]" onclick='openRenameModal({{ conv.id }}, {{ conv.title|tojson }})'>Rename</button>
+    <button type="button" class="block w-full text-left px-4 py-2 text-sm hover:bg-[#f1f2f4]" onclick='deleteConversation({{ conv.id }})'>Delete</button>
+  </div>
 </div>

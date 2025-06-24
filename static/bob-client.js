@@ -63,3 +63,21 @@ function openRenameModal(convId, currentTitle) {
     modal.classList.add('hidden');
   };
 }
+
+function toggleMenu(convId) {
+  const menu = document.getElementById(`menu-${convId}`);
+  if (menu) {
+    menu.classList.toggle('hidden');
+  }
+}
+
+async function deleteConversation(convId) {
+  if (!confirm('Delete this conversation?')) return;
+  const resp = await fetch(`/${convId}/delete`, { method: 'POST' });
+  if (resp.ok) {
+    const element = document.getElementById(`conv-${convId}`);
+    if (element) element.remove();
+    // Always redirect to the root page to refresh the active conversation state
+    window.location.href = '/';
+  }
+}
